@@ -26,29 +26,10 @@ const Hero = () => {
         <div className="absolute inset-0 hero-overlay"></div>
       </div>
 
-      {/* Content */}
+      {/* Content - removed heading and button */}
       <div className="relative z-10 h-full flex flex-col justify-end pb-24 md:pb-32 px-6">
         <div className="max-w-7xl mx-auto w-full">
-          <h1 
-            className={cn(
-              "font-serif text-4xl md:text-6xl lg:text-7xl text-white mb-4 opacity-0",
-              isLoaded && "animate-fade-up opacity-100"
-            )}
-            style={{ animationDelay: '0.3s' }}
-          >
-            Nigeria like you have never seen it
-          </h1>
-          <div 
-            className={cn(
-              "max-w-3xl opacity-0",
-              isLoaded && "animate-fade-up opacity-100" 
-            )}
-            style={{ animationDelay: '0.6s' }}
-          >
-            <a href="#about" className="btn-primary inline-block mt-6">
-              Discover More
-            </a>
-          </div>
+          {/* Heading and button removed */}
         </div>
       </div>
       
