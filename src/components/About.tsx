@@ -20,7 +20,7 @@ const About = () => {
             "font-serif text-3xl md:text-5xl opacity-0 transform translate-y-4 transition-all duration-700 delay-100",
             isVisible && "opacity-100 translate-y-0"
           )}>
-            A premier travel consulting service
+            Nigeria like you have never seen it
           </h2>
         </div>
         
