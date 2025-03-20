@@ -1,9 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
+import { Menu, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { 
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+  DrawerClose
+} from "@/components/ui/drawer";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const isMobile = useIsMobile();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +28,8 @@ const Navbar = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [scrolled]);
+
+  const navItems = ['Home', 'The Kàábọ̀ Experience', 'Our Vision', 'Catalogue'];
 
   return (
     <header 
@@ -38,8 +50,9 @@ const Navbar = () => {
           kàábọ̀
         </a>
         
+        {/* Desktop navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          {['Home', 'The Kàábọ̀ Experience', 'Our Vision', 'Catalogue'].map((item) => (
+          {navItems.map((item) => (
             <a 
               key={item} 
               href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
@@ -50,11 +63,54 @@ const Navbar = () => {
           ))}
         </nav>
         
+        {/* Mobile hamburger menu */}
+        {isMobile && (
+          <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <DrawerTrigger asChild>
+              <button 
+                className="md:hidden focus:outline-none p-1"
+                aria-label="Toggle menu"
+              >
+                <Menu 
+                  size={24} 
+                  color={scrolled ? '#235c35' : 'white'} 
+                />
+              </button>
+            </DrawerTrigger>
+            <DrawerContent className="h-[70vh] p-6">
+              <div className="flex justify-end mb-4">
+                <DrawerClose asChild>
+                  <button className="p-1 focus:outline-none">
+                    <X size={24} />
+                  </button>
+                </DrawerClose>
+              </div>
+              <nav className="flex flex-col space-y-6">
+                {navItems.map((item) => (
+                  <a 
+                    key={item} 
+                    href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="text-lg font-medium hover:text-forest transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item}
+                  </a>
+                ))}
+                <button className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4">
+                  ENROLL NOW
+                </button>
+              </nav>
+            </DrawerContent>
+          </Drawer>
+        )}
+        
+        {/* Enroll button (only shown on desktop when not using the hamburger) */}
         <button className={cn(
           "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300",
           scrolled 
             ? "bg-forest text-white hover:bg-opacity-90" 
-            : "bg-white text-forest hover:bg-opacity-90"
+            : "bg-white text-forest hover:bg-opacity-90",
+          isMobile ? "hidden" : "block"
         )}>
           ENROLL NOW
         </button>
