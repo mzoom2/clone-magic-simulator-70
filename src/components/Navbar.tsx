@@ -9,12 +9,30 @@ import {
   SheetTrigger,
   SheetClose
 } from "@/components/ui/sheet";
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activePage, setActivePage] = useState('Home'); // Set default active page to Home
+  const location = useLocation();
+  
+  // Determine active page based on route
+  const [activePage, setActivePage] = useState('Home');
+  
+  useEffect(() => {
+    // Set the active page based on the current route
+    if (location.pathname === '/') {
+      setActivePage('Home');
+    } else if (location.pathname === '/experience') {
+      setActivePage('The Kàábọ̀ Experience');
+    } else if (location.pathname.includes('vision')) {
+      setActivePage('Our Vision');
+    } else if (location.pathname.includes('catalogue')) {
+      setActivePage('Catalogue');
+    }
+  }, [location]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +49,22 @@ const Navbar = () => {
   }, [scrolled]);
 
   const navItems = ['Home', 'The Kàábọ̀ Experience', 'Our Vision', 'Catalogue'];
+  
+  // Function to get the link path for each nav item
+  const getNavItemPath = (item: string) => {
+    switch (item) {
+      case 'Home':
+        return '/';
+      case 'The Kàábọ̀ Experience':
+        return '/experience';
+      case 'Our Vision':
+        return '/vision';
+      case 'Catalogue':
+        return '/catalogue';
+      default:
+        return '/';
+    }
+  };
 
   return (
     <header 
@@ -40,8 +74,8 @@ const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <a 
-          href="#" 
+        <Link 
+          to="/"
           className="font-serif text-2xl md:text-3xl font-medium transition-opacity duration-300"
           style={{ 
             color: scrolled ? '#235c35' : 'white',
@@ -49,21 +83,21 @@ const Navbar = () => {
           }}
         >
           kàábọ̀
-        </a>
+        </Link>
         
         {/* Desktop navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
-            <a 
+            <Link 
               key={item} 
-              href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+              to={getNavItemPath(item)}
               className={cn(
                 scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
                 item === activePage && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
               )}
             >
               {item}
-            </a>
+            </Link>
           ))}
         </nav>
         
@@ -84,9 +118,9 @@ const Navbar = () => {
             <SheetContent side="right" className="p-6">
               <nav className="flex flex-col space-y-6 pt-8">
                 {navItems.map((item) => (
-                  <a 
+                  <Link 
                     key={item} 
-                    href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+                    to={getNavItemPath(item)}
                     className={cn(
                       "text-lg font-medium hover:text-forest transition-colors",
                       item === activePage && "text-forest border-b border-forest pb-1"
@@ -94,7 +128,7 @@ const Navbar = () => {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item}
-                  </a>
+                  </Link>
                 ))}
                 <button className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4">
                   ENROLL NOW
