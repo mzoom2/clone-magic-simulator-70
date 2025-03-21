@@ -45,7 +45,7 @@ const KaaboExperience = () => {
       {/* Pricing Cards */}
       <section className="py-12 px-6 bg-cream">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-center gap-8 mb-12">
+          <div className="flex flex-col md:flex-row justify-center gap-4 mb-12">
             {/* Weekenders Package */}
             <Card className="border-none shadow-md overflow-hidden bg-white max-w-sm w-full mx-auto">
               <CardContent className="p-0">
