@@ -9,6 +9,7 @@ import KaaboExperience from "./pages/KaaboExperience";
 import Vision from "./pages/Vision";
 import Catalogue from "./pages/Catalogue";
 import SummerTech from "./pages/SummerTech";
+import OctoberTech from "./pages/OctoberTech";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,7 +26,7 @@ const App = () => (
           <Route path="/vision" element={<Vision />} />
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/catalogue/summer-tech" element={<SummerTech />} />
-          <Route path="/catalogue/october-tech" element={<Catalogue />} />
+          <Route path="/catalogue/october-tech" element={<OctoberTech />} />
           <Route path="/catalogue/fashion-week" element={<Catalogue />} />
           <Route path="/catalogue/lagos-artventure" element={<Catalogue />} />
           <Route path="/catalogue/behind-the-scenes" element={<Catalogue />} />
