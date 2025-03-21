@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useBooking } from '@/contexts/BookingContext';
 import BookingModal from './BookingModal';
+import PackageSelectionModal from './PackageSelectionModal';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -25,6 +27,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
   const { setSelectedExperience } = useBooking();
   
   // Determine active page based on route
@@ -85,17 +88,13 @@ const Navbar = () => {
   ];
 
   const handleEnrollClick = () => {
-    // Create a default experience for enrollment
-    const defaultExperience = {
-      id: 'default-experience',
-      title: 'Kàábọ̀ Experience',
-      price: 1900, // Default price
-      occupancyType: 'Standard Package'
-    };
-    
-    setSelectedExperience(defaultExperience);
-    setIsBookingModalOpen(true);
+    setIsPackageModalOpen(true);
     setIsMenuOpen(false); // Close mobile menu if open
+  };
+  
+  const handleSelectPackage = (experience: any) => {
+    setSelectedExperience(experience);
+    setIsBookingModalOpen(true);
   };
 
   return (
@@ -259,7 +258,14 @@ const Navbar = () => {
         </div>
       </header>
       
-      {/* Add the booking modal */}
+      {/* Package Selection Modal */}
+      <PackageSelectionModal 
+        isOpen={isPackageModalOpen}
+        onClose={() => setIsPackageModalOpen(false)}
+        onSelectPackage={handleSelectPackage}
+      />
+      
+      {/* Booking Modal */}
       <BookingModal 
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
