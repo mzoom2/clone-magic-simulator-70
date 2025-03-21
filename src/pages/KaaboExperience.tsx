@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ChevronRight, Check, Plus } from 'lucide-react';
+import { ChevronRight, Check, Plus, ArrowRight } from 'lucide-react';
 
 const KaaboExperience = () => {
   return (
@@ -186,8 +186,12 @@ const KaaboExperience = () => {
               <div className="absolute inset-0 flex flex-col items-center justify-end p-6 text-white text-center">
                 <h3 className="font-serif text-2xl mb-1">Tech &</h3>
                 <h3 className="font-serif text-2xl mb-6">Culture Fusion</h3>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-forest">
+                <Button 
+                  variant="outline" 
+                  className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
+                >
                   DISCOVER
+                  <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
             </div>
@@ -203,8 +207,12 @@ const KaaboExperience = () => {
               <div className="absolute inset-0 flex flex-col items-center justify-end p-6 text-white text-center">
                 <h3 className="font-serif text-2xl mb-1">Wellness &</h3>
                 <h3 className="font-serif text-2xl mb-6">Design Discovery</h3>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-forest">
+                <Button 
+                  variant="outline" 
+                  className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
+                >
                   DISCOVER
+                  <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
             </div>
@@ -220,8 +228,12 @@ const KaaboExperience = () => {
               <div className="absolute inset-0 flex flex-col items-center justify-end p-6 text-white text-center">
                 <h3 className="font-serif text-2xl mb-1">Cultural &</h3>
                 <h3 className="font-serif text-2xl mb-6">Business Blend</h3>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-forest">
+                <Button 
+                  variant="outline" 
+                  className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
+                >
                   DISCOVER
+                  <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
             </div>
