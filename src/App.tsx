@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import KaaboExperience from "./pages/KaaboExperience";
 import Vision from "./pages/Vision";
+import Catalogue from "./pages/Catalogue";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,13 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/experience" element={<KaaboExperience />} />
           <Route path="/vision" element={<Vision />} />
+          <Route path="/catalogue" element={<Catalogue />} />
+          <Route path="/catalogue/summer-tech" element={<Catalogue />} />
+          <Route path="/catalogue/october-tech" element={<Catalogue />} />
+          <Route path="/catalogue/fashion-week" element={<Catalogue />} />
+          <Route path="/catalogue/lagos-artventure" element={<Catalogue />} />
+          <Route path="/catalogue/behind-the-scenes" element={<Catalogue />} />
+          <Route path="/catalogue/detty-december" element={<Catalogue />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
