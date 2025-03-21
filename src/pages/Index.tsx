@@ -6,7 +6,7 @@ import About from '@/components/About';
 import Experience from '@/components/Experience';
 import Testimonial from '@/components/Testimonial';
 import Contact from '@/components/Contact';
-import Footer from '@/components/Footer';
+import ResponsiveFooter from '@/components/ResponsiveFooter';
 
 const Index = () => {
   // Add smooth scroll behavior for anchor links
@@ -42,7 +42,7 @@ const Index = () => {
       <Experience />
       <Testimonial />
       <Contact />
-      <Footer />
+      <ResponsiveFooter />
     </div>
   );
 };

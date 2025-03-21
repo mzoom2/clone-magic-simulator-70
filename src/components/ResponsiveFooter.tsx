@@ -2,54 +2,73 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const ResponsiveFooter = () => {
-  const isMobile = useIsMobile();
-  
   return (
-    <footer className="bg-[#3a4d28] text-white">
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Logo + Tagline */}
+    <footer className="bg-[#3a4d28] text-white py-16">
+      <div className="container mx-auto px-4 md:px-8">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {/* Column 1: Logo and Tagline */}
           <div>
             <img 
               src="/lovable-uploads/5105021d-b044-4cfc-8833-37ce9098c033.png" 
               alt="Kàábọ̀ Logo" 
-              className="h-12 md:h-16 mb-4" 
+              className="h-16 mb-6" 
             />
-            <p className="font-serif text-lg md:text-xl">Experience, Explore, Elevate:</p>
-            <p>Nigeria like you have never seen it</p>
+            <div className="space-y-1">
+              <p className="font-medium text-lg">Experience, Explore, Elevate:</p>
+              <p className="text-base">Nigeria like you have never seen it</p>
+            </div>
           </div>
           
-          {/* Contact Info */}
-          <div className={isMobile ? "" : "md:text-center"}>
-            <h3 className="text-xl mb-4">Contact Info</h3>
-            <p className="font-bold">KAABO INC</p>
-            <p>info@experiencekaabo.com</p>
+          {/* Column 2: Contact Info */}
+          <div className="flex flex-col justify-center md:items-center">
+            <h3 className="text-2xl font-serif mb-6">Contact Info</h3>
+            <p className="text-xl font-bold mb-2">KAABO INC</p>
+            <p className="text-base">info@experiencekaabo.com</p>
           </div>
           
-          {/* Newsletter */}
-          <div className={isMobile ? "" : "md:text-right"}>
-            <h3 className="text-xl mb-4">Subscribe To Our Newsletter</h3>
-            <div className="flex flex-col md:flex-row items-center gap-2 md:justify-end">
-              <input 
+          {/* Column 3: Newsletter */}
+          <div className="flex flex-col justify-center md:items-end">
+            <h3 className="text-2xl font-serif mb-6">Subscribe To Our Newsletter</h3>
+            <div className="flex flex-col gap-4 w-full md:max-w-xs">
+              <Input 
                 type="email" 
                 placeholder="Email Address" 
-                className="bg-white rounded-full px-4 py-2 text-black w-full md:w-auto"
+                className="bg-white rounded-md px-4 py-2 text-black border-white"
               />
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-forest rounded-full whitespace-nowrap w-full md:w-auto mt-2 md:mt-0">
+              <Button 
+                variant="outline" 
+                className="bg-[#e6d7c3] hover:bg-[#e6d7c3]/90 text-forest border-none text-base font-medium rounded-md"
+              >
                 Subscribe
               </Button>
             </div>
           </div>
         </div>
         
-        <div className="mt-12 pt-4 border-t border-white/20 flex flex-col md:flex-row justify-between items-center">
+        {/* Footer Bottom */}
+        <div className="mt-16 pt-4 border-t border-white/20 flex flex-col md:flex-row justify-between items-center">
           <p>© 2025 Kaabo. All Rights Reserved.</p>
           
-          <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <Link to="/cookie-policy" className="hover:underline">
+          <div className="flex flex-col md:flex-row items-center gap-6 mt-6 md:mt-0">
+            {/* Social Media Icons */}
+            <div className="flex items-center gap-4">
+              <a href="#" className="text-white hover:text-white/80">
+                <Facebook size={24} />
+              </a>
+              <a href="#" className="text-white hover:text-white/80">
+                <Instagram size={24} />
+              </a>
+              <a href="#" className="text-white hover:text-white/80">
+                <Linkedin size={24} />
+              </a>
+            </div>
+            
+            <Link to="/cookie-policy" className="text-white hover:underline">
               Cookie Policy (EU)
             </Link>
           </div>
