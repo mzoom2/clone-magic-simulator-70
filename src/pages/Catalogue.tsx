@@ -1,7 +1,6 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import ResponsiveFooter from '@/components/ResponsiveFooter';
 import { Check, Plus } from 'lucide-react';
 import {
   Accordion,
@@ -308,7 +307,7 @@ const Catalogue = () => {
         </div>
       </section>
       
-      <Footer />
+      <ResponsiveFooter />
     </div>
   );
 };
