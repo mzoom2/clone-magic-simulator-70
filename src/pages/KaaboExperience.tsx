@@ -47,93 +47,95 @@ const KaaboExperience = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 mb-12 justify-center">
             {/* Weekenders Package */}
-            <Card className="border-none shadow-md overflow-hidden bg-white max-w-sm">
+            <Card className="border-none overflow-hidden bg-white max-w-sm">
               <CardContent className="p-0">
                 <div className="bg-sand p-4 text-center">
-                  <h3 className="font-serif text-xl uppercase mb-2">The Weekenders</h3>
+                  <h3 className="font-serif text-xl uppercase mb-0">THE WEEKENDERS</h3>
                   <p className="text-sm text-muted-foreground">3 days • 2 nights</p>
                 </div>
                 
                 <div className="p-6 text-center">
                   <div className="mb-6">
                     <span className="text-4xl font-serif text-forest">
-                      <sup className="text-lg relative -top-3">$</sup>
-                      1,500
+                      <sup className="text-xl relative -top-3">$</sup>
+                      <span className="text-5xl">1,500</span>
                     </span>
                   </div>
                   
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 text-left">
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>3-Night Stay & 3-Day Itinerary</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>Daily Transportation</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>Hotel & Activities for the Weekend</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>Visa or e-Visa Facilitation</span>
                     </li>
                   </ul>
                   
-                  <Button className="bg-forest hover:bg-forest/90 text-white">
+                  <Button className="bg-forest hover:bg-forest/90 text-white rounded-none w-full mb-4">
                     EXPLORE MORE
                   </Button>
                   
-                  <p className="mt-4 text-xs text-muted-foreground px-4">
-                    All prices include: International flight to Lagos (not included), hotel accommodation, and guided tour with transportation. Terms and conditions apply.
-                  </p>
+                  <div className="text-xs text-muted-foreground px-2 leading-tight">
+                    <p className="mb-1">All prices include:</p>
+                    <p>International flight to Lagos (not included), hotel accommodation, and guided tour with transportation.</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
             
             {/* Full Experience */}
-            <Card className="border-none shadow-md overflow-hidden bg-white max-w-sm">
+            <Card className="border-none overflow-hidden bg-white max-w-sm">
               <CardContent className="p-0">
                 <div className="bg-sand p-4 text-center">
-                  <h3 className="font-serif text-xl uppercase mb-2">The Full Experience</h3>
+                  <h3 className="font-serif text-xl uppercase mb-0">THE FULL EXPERIENCE</h3>
                   <p className="text-sm text-muted-foreground">7 days • 6 nights</p>
                 </div>
                 
                 <div className="p-6 text-center">
                   <div className="mb-6">
                     <span className="text-4xl font-serif text-forest">
-                      <sup className="text-lg relative -top-3">$</sup>
-                      2,700
+                      <sup className="text-xl relative -top-3">$</sup>
+                      <span className="text-5xl">2,700</span>
                     </span>
                   </div>
                   
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 text-left">
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>6-Night Stay & 7-Day Itinerary</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>Daily Transportation</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>Hotel & Activities for Full Week</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check size={20} className="text-forest" />
+                      <Check size={18} className="text-forest min-w-5" />
                       <span>Visa or e-Visa Facilitation</span>
                     </li>
                   </ul>
                   
-                  <Button className="bg-forest hover:bg-forest/90 text-white">
+                  <Button className="bg-forest hover:bg-forest/90 text-white rounded-none w-full mb-4">
                     EXPLORE MORE
                   </Button>
                   
-                  <p className="mt-4 text-xs text-muted-foreground px-4">
-                    All prices include: International flight to Lagos (not included), hotel accommodation, and guided tour with transportation. Terms and conditions apply.
-                  </p>
+                  <div className="text-xs text-muted-foreground px-2 leading-tight">
+                    <p className="mb-1">All prices include:</p>
+                    <p>International flight to Lagos (not included), hotel accommodation, and guided tour with transportation.</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
