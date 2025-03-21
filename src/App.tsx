@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { BookingProvider } from "./contexts/BookingContext";
 import Index from "./pages/Index";
 import KaaboExperience from "./pages/KaaboExperience";
 import Vision from "./pages/Vision";
@@ -22,26 +21,24 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BookingProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/experience" element={<KaaboExperience />} />
-            <Route path="/vision" element={<Vision />} />
-            <Route path="/catalogue" element={<Catalogue />} />
-            <Route path="/catalogue/summer-tech" element={<SummerTech />} />
-            <Route path="/catalogue/october-tech" element={<OctoberTech />} />
-            <Route path="/catalogue/fashion-week" element={<FashionWeek />} />
-            <Route path="/catalogue/lagos-artventure" element={<LagosArtventure />} />
-            <Route path="/catalogue/behind-the-scenes" element={<BehindTheScenes />} />
-            <Route path="/catalogue/detty-december" element={<DettyDecember />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </BookingProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/experience" element={<KaaboExperience />} />
+          <Route path="/vision" element={<Vision />} />
+          <Route path="/catalogue" element={<Catalogue />} />
+          <Route path="/catalogue/summer-tech" element={<SummerTech />} />
+          <Route path="/catalogue/october-tech" element={<OctoberTech />} />
+          <Route path="/catalogue/fashion-week" element={<FashionWeek />} />
+          <Route path="/catalogue/lagos-artventure" element={<LagosArtventure />} />
+          <Route path="/catalogue/behind-the-scenes" element={<BehindTheScenes />} />
+          <Route path="/catalogue/detty-december" element={<DettyDecember />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -17,18 +16,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useBooking } from '@/contexts/BookingContext';
-import BookingModal from './BookingModal';
-import PackageSelectionModal from './PackageSelectionModal';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
-  const { setSelectedExperience } = useBooking();
   
   // Determine active page based on route
   const [activePage, setActivePage] = useState('Home');
@@ -87,190 +80,159 @@ const Navbar = () => {
     { name: 'Detty December', path: '/catalogue/detty-december' },
   ];
 
-  const handleEnrollClick = () => {
-    setIsPackageModalOpen(true);
-    setIsMenuOpen(false); // Close mobile menu if open
-  };
-  
-  const handleSelectPackage = (experience: any) => {
-    setSelectedExperience(experience);
-    setIsBookingModalOpen(true);
-  };
-
   return (
-    <>
-      <header 
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
-          scrolled ? "bg-white/80 shadow-sm backdrop-blur-md" : "bg-transparent"
-        )}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link 
-            to="/"
-            className="font-serif text-2xl md:text-3xl font-medium transition-opacity duration-300"
-            style={{ 
-              color: scrolled ? '#235c35' : 'white',
-              opacity: 1 
-            }}
-          >
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
+        scrolled ? "bg-white/80 shadow-sm backdrop-blur-md" : "bg-transparent"
+      )}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <Link 
+          to="/"
+          className="font-serif text-2xl md:text-3xl font-medium transition-opacity duration-300"
+          style={{ 
+            color: scrolled ? '#235c35' : 'white',
+            opacity: 1 
+          }}
+        >
           kàábọ̀
-          </Link>
+        </Link>
+        
+        {/* Desktop navigation */}
+        <nav className="hidden md:flex items-center space-x-8">
+          {/* Regular nav items */}
+          {navItems.map((item) => (
+            <Link 
+              key={item} 
+              to={getNavItemPath(item)}
+              className={cn(
+                scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
+                item === activePage && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
+              )}
+            >
+              {item}
+            </Link>
+          ))}
           
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {/* Regular nav items */}
-            {navItems.map((item) => (
-              <Link 
-                key={item} 
-                to={getNavItemPath(item)}
-                className={cn(
-                  scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
-                  item === activePage && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
-                )}
-              >
-                {item}
-              </Link>
-            ))}
+          {/* Catalogue dropdown - modified to have separate link and dropdown */}
+          <div className="flex items-center gap-1 relative">
+            <Link 
+              to="/catalogue"
+              className={cn(
+                scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
+                activePage === 'Catalogue' && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
+              )}
+            >
+              Catalogue
+            </Link>
             
-            {/* Catalogue dropdown - modified to have separate link and dropdown */}
-            <div className="flex items-center gap-1 relative">
-              <Link 
-                to="/catalogue"
-                className={cn(
-                  scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
-                  activePage === 'Catalogue' && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
-                )}
-              >
-                Catalogue
-              </Link>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button 
-                    className={cn(
-                      "flex items-center",
-                      scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link"
-                    )}
-                  >
-                    <ChevronDown size={16} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  className="w-56 bg-[#FEF7CD] border-none rounded-none p-0 shadow-md" 
-                  align="center"
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className={cn(
+                    "flex items-center",
+                    scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link"
+                  )}
                 >
-                  {catalogueItems.map((item) => (
-                    <DropdownMenuItem key={item.name} asChild className="p-0">
-                      <Link 
-                        to={item.path} 
-                        className="w-full py-4 px-6 text-forest hover:bg-[#FEF7CD]/80 text-base font-medium border-b border-[#235c35]/10 last:border-0"
+                  <ChevronDown size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-56 bg-[#FEF7CD] border-none rounded-none p-0 shadow-md" 
+                align="center"
+              >
+                {catalogueItems.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild className="p-0">
+                    <Link 
+                      to={item.path} 
+                      className="w-full py-4 px-6 text-forest hover:bg-[#FEF7CD]/80 text-base font-medium border-b border-[#235c35]/10 last:border-0"
+                    >
+                      {item.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </nav>
+        
+        {/* Mobile hamburger menu */}
+        {isMobile && (
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <button 
+                className="md:hidden focus:outline-none p-1"
+                aria-label="Toggle menu"
+              >
+                <Menu 
+                  size={24} 
+                  color={scrolled ? '#235c35' : 'white'} 
+                />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="p-6">
+              <nav className="flex flex-col space-y-6 pt-8">
+                {navItems.map((item) => (
+                  <Link 
+                    key={item} 
+                    to={getNavItemPath(item)}
+                    className={cn(
+                      "text-lg font-medium hover:text-forest transition-colors",
+                      item === activePage && "text-forest border-b border-forest pb-1"
+                    )}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item}
+                  </Link>
+                ))}
+                
+                {/* Mobile Catalogue link and dropdown */}
+                <div className="space-y-4">
+                  <Link
+                    to="/catalogue"
+                    className={cn(
+                      "block text-lg font-medium hover:text-forest transition-colors",
+                      location.pathname.includes('catalogue') && "text-forest border-b border-forest pb-1"
+                    )}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Catalogue
+                  </Link>
+                  <div className="pl-4 flex flex-col space-y-3">
+                    {catalogueItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        className="text-base hover:text-forest transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
                       >
                         {item.name}
                       </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </nav>
-          
-          {/* Mobile hamburger menu */}
-          {isMobile && (
-            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <SheetTrigger asChild>
-                <button 
-                  className="md:hidden focus:outline-none p-1"
-                  aria-label="Toggle menu"
-                >
-                  <Menu 
-                    size={24} 
-                    color={scrolled ? '#235c35' : 'white'} 
-                  />
-                </button>
-              </SheetTrigger>
-              <SheetContent side="right" className="p-6">
-                <nav className="flex flex-col space-y-6 pt-8">
-                  {navItems.map((item) => (
-                    <Link 
-                      key={item} 
-                      to={getNavItemPath(item)}
-                      className={cn(
-                        "text-lg font-medium hover:text-forest transition-colors",
-                        item === activePage && "text-forest border-b border-forest pb-1"
-                      )}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                  
-                  {/* Mobile Catalogue link and dropdown */}
-                  <div className="space-y-4">
-                    <Link
-                      to="/catalogue"
-                      className={cn(
-                        "block text-lg font-medium hover:text-forest transition-colors",
-                        location.pathname.includes('catalogue') && "text-forest border-b border-forest pb-1"
-                      )}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Catalogue
-                    </Link>
-                    <div className="pl-4 flex flex-col space-y-3">
-                      {catalogueItems.map((item) => (
-                        <Link
-                          key={item.name}
-                          to={item.path}
-                          className="text-base hover:text-forest transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
+                    ))}
                   </div>
-                  
-                  <button 
-                    className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4"
-                    onClick={handleEnrollClick}
-                  >
-                    ENROLL NOW
-                  </button>
-                </nav>
-              </SheetContent>
-            </Sheet>
-          )}
-          
-          {/* Enroll button (only shown on desktop when not using the hamburger) */}
-          <button 
-            className={cn(
-              "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300",
-              scrolled 
-                ? "bg-forest text-white hover:bg-opacity-90" 
-                : "bg-white text-forest hover:bg-opacity-90",
-              isMobile ? "hidden" : "block"
-            )}
-            onClick={handleEnrollClick}
-          >
-            ENROLL NOW
-          </button>
-        </div>
-      </header>
-      
-      {/* Package Selection Modal */}
-      <PackageSelectionModal 
-        isOpen={isPackageModalOpen}
-        onClose={() => setIsPackageModalOpen(false)}
-        onSelectPackage={handleSelectPackage}
-      />
-      
-      {/* Booking Modal */}
-      <BookingModal 
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-      />
-    </>
+                </div>
+                
+                <button className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4">
+                  ENROLL NOW
+                </button>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        )}
+        
+        {/* Enroll button (only shown on desktop when not using the hamburger) */}
+        <button className={cn(
+          "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300",
+          scrolled 
+            ? "bg-forest text-white hover:bg-opacity-90" 
+            : "bg-white text-forest hover:bg-opacity-90",
+          isMobile ? "hidden" : "block"
+        )}>
+          ENROLL NOW
+        </button>
+      </div>
+    </header>
   );
 };
 
