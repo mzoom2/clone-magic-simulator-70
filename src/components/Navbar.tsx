@@ -78,14 +78,7 @@ const Navbar = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="p-6">
-              <div className="flex justify-end mb-4">
-                <SheetClose asChild>
-                  <button className="p-1 focus:outline-none">
-                    <X size={24} />
-                  </button>
-                </SheetClose>
-              </div>
-              <nav className="flex flex-col space-y-6">
+              <nav className="flex flex-col space-y-6 pt-8">
                 {navItems.map((item) => (
                   <a 
                     key={item} 
