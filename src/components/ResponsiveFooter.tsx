@@ -14,7 +14,7 @@ const ResponsiveFooter = () => {
           {/* Column 1: Logo and Tagline */}
           <div>
             <img 
-              src="/lovable-uploads/5105021d-b044-4cfc-8833-37ce9098c033.png" 
+              src="/lovable-uploads/3f0dd4b3-98f9-401c-beb6-ec25972e659d.png" 
               alt="Kàábọ̀ Logo" 
               className="h-16 mb-6" 
             />
