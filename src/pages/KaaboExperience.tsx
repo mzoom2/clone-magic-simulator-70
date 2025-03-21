@@ -1,7 +1,6 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import ResponsiveFooter from '@/components/ResponsiveFooter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -336,7 +335,7 @@ const KaaboExperience = () => {
         </div>
       </section>
       
-      <Footer />
+      <ResponsiveFooter />
     </div>
   );
 };
