@@ -2,6 +2,8 @@
 import React, { useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { PlayCircle, Volume2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const experiences = [
   {
@@ -24,9 +26,34 @@ const experiences = [
   }
 ];
 
+const experiencePhotos = [
+  {
+    id: 1,
+    title: "Lagos Market Tour",
+    image: "https://images.unsplash.com/photo-1473091534298-04dcbce3278c?q=80&w=1200",
+  },
+  {
+    id: 2,
+    title: "Traditional Ceremonies",
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200",
+  },
+  {
+    id: 3,
+    title: "Culinary Workshops",
+    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=1200",
+  },
+  {
+    id: 4,
+    title: "Tech Meetups",
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=1200",
+  }
+];
+
 const Experience = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const photosRef = useRef<HTMLDivElement>(null);
   const isVisible = useIntersectionObserver(sectionRef, { threshold: 0.1 });
+  const arePhotosVisible = useIntersectionObserver(photosRef, { threshold: 0.1 });
 
   return (
     <section id="experience" ref={sectionRef} className="py-20 md:py-28 px-6 bg-sand/50">
@@ -46,7 +73,7 @@ const Experience = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
           {experiences.map((exp, index) => (
             <div 
               key={exp.id}
@@ -73,6 +100,43 @@ const Experience = () => {
               </div>
             </div>
           ))}
+        </div>
+        
+        {/* Photo Gallery Section */}
+        <div ref={photosRef} className="mt-16">
+          <h3 className={cn(
+            "font-serif text-2xl md:text-3xl mb-8 text-center opacity-0 transform translate-y-4 transition-all duration-700",
+            arePhotosVisible && "opacity-100 translate-y-0"
+          )}>
+            Photo Gallery
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {experiencePhotos.map((photo, index) => (
+              <Card 
+                key={photo.id}
+                className={cn(
+                  "overflow-hidden opacity-0 transform translate-y-4 transition-all duration-700",
+                  arePhotosVisible && "opacity-100 translate-y-0"
+                )}
+                style={{ transitionDelay: `${200 + index * 100}ms` }}
+              >
+                <CardContent className="p-0">
+                  <AspectRatio ratio={4/3} className="bg-muted">
+                    <img 
+                      src={photo.image} 
+                      alt={photo.title} 
+                      className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-300"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                      <h4 className="text-white font-medium">{photo.title}</h4>
+                    </div>
+                  </AspectRatio>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </section>
