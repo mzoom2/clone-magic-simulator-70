@@ -13,6 +13,7 @@ import OctoberTech from "./pages/OctoberTech";
 import FashionWeek from "./pages/FashionWeek";
 import LagosArtventure from "./pages/LagosArtventure";
 import BehindTheScenes from "./pages/BehindTheScenes";
+import DettyDecember from "./pages/DettyDecember";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,7 +34,7 @@ const App = () => (
           <Route path="/catalogue/fashion-week" element={<FashionWeek />} />
           <Route path="/catalogue/lagos-artventure" element={<LagosArtventure />} />
           <Route path="/catalogue/behind-the-scenes" element={<BehindTheScenes />} />
-          <Route path="/catalogue/detty-december" element={<Catalogue />} />
+          <Route path="/catalogue/detty-december" element={<DettyDecember />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
