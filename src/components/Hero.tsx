@@ -11,18 +11,23 @@ const Hero = () => {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Hero Background Image */}
+      {/* Hero Background Video */}
       <div className="absolute inset-0 w-full h-full">
-        <img 
-          src="/lovable-uploads/1bfbcad9-04e3-445e-8d19-840a15a1642a.png" 
-          alt="Aerial view of Nigeria" 
+        <video 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
           className="w-full h-full object-cover"
           style={{
             opacity: isLoaded ? 1 : 0.3,
             transition: 'opacity 1.5s ease-in-out'
           }}
-          onLoad={() => setIsLoaded(true)}
-        />
+          onLoadedData={() => setIsLoaded(true)}
+        >
+          <source src="/lovable-uploads/1bfbcad9-04e3-445e-8d19-840a15a1642a.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
         <div className="absolute inset-0 hero-overlay"></div>
       </div>
 
