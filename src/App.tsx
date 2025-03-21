@@ -10,6 +10,7 @@ import Vision from "./pages/Vision";
 import Catalogue from "./pages/Catalogue";
 import SummerTech from "./pages/SummerTech";
 import OctoberTech from "./pages/OctoberTech";
+import FashionWeek from "./pages/FashionWeek";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +28,7 @@ const App = () => (
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/catalogue/summer-tech" element={<SummerTech />} />
           <Route path="/catalogue/october-tech" element={<OctoberTech />} />
-          <Route path="/catalogue/fashion-week" element={<Catalogue />} />
+          <Route path="/catalogue/fashion-week" element={<FashionWeek />} />
           <Route path="/catalogue/lagos-artventure" element={<Catalogue />} />
           <Route path="/catalogue/behind-the-scenes" element={<Catalogue />} />
           <Route path="/catalogue/detty-december" element={<Catalogue />} />
