@@ -14,6 +14,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activePage, setActivePage] = useState('Home'); // Set default active page to Home
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,7 +57,10 @@ const Navbar = () => {
             <a 
               key={item} 
               href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-              className={scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link"}
+              className={cn(
+                scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
+                item === activePage && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
+              )}
             >
               {item}
             </a>
@@ -83,7 +87,10 @@ const Navbar = () => {
                   <a 
                     key={item} 
                     href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="text-lg font-medium hover:text-forest transition-colors"
+                    className={cn(
+                      "text-lg font-medium hover:text-forest transition-colors",
+                      item === activePage && "text-forest border-b border-forest pb-1"
+                    )}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item}
