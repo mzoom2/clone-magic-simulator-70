@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { PlayCircle, Volume2 } from "lucide-react";
@@ -29,23 +28,23 @@ const experiences = [
 const experiencePhotos = [
   {
     id: 1,
-    title: "Lagos Market Tour",
-    image: "https://images.unsplash.com/photo-1473091534298-04dcbce3278c?q=80&w=1200",
+    title: "Nigerian Art Exhibition",
+    image: "/lovable-uploads/96279a5f-6291-4c07-9ed1-946fbc4ae3dc.png",
   },
   {
     id: 2,
-    title: "Traditional Ceremonies",
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200",
+    title: "Olumo Rock Experience",
+    image: "/lovable-uploads/99d1a1e9-33f0-48d1-884c-3aa027ee3443.png",
   },
   {
     id: 3,
-    title: "Culinary Workshops",
-    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=1200",
+    title: "Scenic View of Abeokuta",
+    image: "/lovable-uploads/98c065bb-d219-401e-90c2-6c8db78dbb40.png",
   },
   {
     id: 4,
-    title: "Tech Meetups",
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=1200",
+    title: "Natural Heritage Sites",
+    image: "/lovable-uploads/98c065bb-d219-401e-90c2-6c8db78dbb40.png",
   }
 ];
 
