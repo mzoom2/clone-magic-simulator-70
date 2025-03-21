@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
-  Drawer,
-  DrawerContent,
-  DrawerTrigger,
-  DrawerClose
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose
+} from "@/components/ui/sheet";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -65,8 +65,8 @@ const Navbar = () => {
         
         {/* Mobile hamburger menu */}
         {isMobile && (
-          <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen} direction="right">
-            <DrawerTrigger asChild>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
               <button 
                 className="md:hidden focus:outline-none p-1"
                 aria-label="Toggle menu"
@@ -76,14 +76,14 @@ const Navbar = () => {
                   color={scrolled ? '#235c35' : 'white'} 
                 />
               </button>
-            </DrawerTrigger>
-            <DrawerContent className="h-[70vh] p-6 right-0 left-auto w-[85vw] max-w-md rounded-l-lg">
+            </SheetTrigger>
+            <SheetContent side="right" className="p-6">
               <div className="flex justify-end mb-4">
-                <DrawerClose asChild>
+                <SheetClose asChild>
                   <button className="p-1 focus:outline-none">
                     <X size={24} />
                   </button>
-                </DrawerClose>
+                </SheetClose>
               </div>
               <nav className="flex flex-col space-y-6">
                 {navItems.map((item) => (
@@ -100,8 +100,8 @@ const Navbar = () => {
                   ENROLL NOW
                 </button>
               </nav>
-            </DrawerContent>
-          </Drawer>
+            </SheetContent>
+          </Sheet>
         )}
         
         {/* Enroll button (only shown on desktop when not using the hamburger) */}
