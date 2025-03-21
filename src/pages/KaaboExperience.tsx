@@ -45,9 +45,9 @@ const KaaboExperience = () => {
       {/* Pricing Cards */}
       <section className="py-12 px-6 bg-cream">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 mb-12 justify-center">
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* Weekenders Package */}
-            <Card className="border-none shadow-md overflow-hidden bg-white max-w-sm">
+            <Card className="border-none shadow-md overflow-hidden bg-white">
               <CardContent className="p-0">
                 <div className="bg-sand p-4 text-center">
                   <h3 className="font-serif text-xl uppercase mb-2">The Weekenders</h3>
@@ -93,7 +93,7 @@ const KaaboExperience = () => {
             </Card>
             
             {/* Full Experience */}
-            <Card className="border-none shadow-md overflow-hidden bg-white max-w-sm">
+            <Card className="border-none shadow-md overflow-hidden bg-white">
               <CardContent className="p-0">
                 <div className="bg-sand p-4 text-center">
                   <h3 className="font-serif text-xl uppercase mb-2">The Full Experience</h3>
