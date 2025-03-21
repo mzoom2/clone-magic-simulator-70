@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -116,35 +115,46 @@ const Navbar = () => {
             </Link>
           ))}
           
-          {/* Catalogue dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button 
-                className={cn(
-                  "flex items-center gap-1",
-                  scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
-                  activePage === 'Catalogue' && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
-                )}
-              >
-                Catalogue <ChevronDown size={16} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              className="w-56 bg-[#FEF7CD] border-none rounded-none p-0 shadow-md" 
-              align="center"
+          {/* Catalogue dropdown - modified to have separate link and dropdown */}
+          <div className="flex items-center gap-1 relative">
+            <Link 
+              to="/catalogue"
+              className={cn(
+                scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link",
+                activePage === 'Catalogue' && "relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-forest"
+              )}
             >
-              {catalogueItems.map((item) => (
-                <DropdownMenuItem key={item.name} asChild className="p-0">
-                  <Link 
-                    to={item.path} 
-                    className="w-full py-4 px-6 text-forest hover:bg-[#FEF7CD]/80 text-base font-medium border-b border-[#235c35]/10 last:border-0"
-                  >
-                    {item.name}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              Catalogue
+            </Link>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className={cn(
+                    "flex items-center",
+                    scrolled ? "text-foreground hover:text-forest transition-colors" : "nav-link"
+                  )}
+                >
+                  <ChevronDown size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-56 bg-[#FEF7CD] border-none rounded-none p-0 shadow-md" 
+                align="center"
+              >
+                {catalogueItems.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild className="p-0">
+                    <Link 
+                      to={item.path} 
+                      className="w-full py-4 px-6 text-forest hover:bg-[#FEF7CD]/80 text-base font-medium border-b border-[#235c35]/10 last:border-0"
+                    >
+                      {item.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </nav>
         
         {/* Mobile hamburger menu */}
@@ -177,11 +187,18 @@ const Navbar = () => {
                   </Link>
                 ))}
                 
-                {/* Mobile Catalogue dropdown */}
+                {/* Mobile Catalogue link and dropdown */}
                 <div className="space-y-4">
-                  <div className="text-lg font-medium text-forest border-b border-forest pb-1">
+                  <Link
+                    to="/catalogue"
+                    className={cn(
+                      "block text-lg font-medium hover:text-forest transition-colors",
+                      location.pathname.includes('catalogue') && "text-forest border-b border-forest pb-1"
+                    )}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     Catalogue
-                  </div>
+                  </Link>
                   <div className="pl-4 flex flex-col space-y-3">
                     {catalogueItems.map((item) => (
                       <Link
