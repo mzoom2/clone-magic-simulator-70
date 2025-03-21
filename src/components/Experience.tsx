@@ -43,8 +43,8 @@ const experiencePhotos = [
   },
   {
     id: 4,
-    title: "Natural Heritage Sites",
-    image: "/lovable-uploads/98c065bb-d219-401e-90c2-6c8db78dbb40.png",
+    title: "National Theatre Lagos",
+    image: "/lovable-uploads/5617c3ad-1f1f-4878-ae9a-40862d14df7b.png",
   }
 ];
 
