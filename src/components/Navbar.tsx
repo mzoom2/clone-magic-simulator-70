@@ -65,7 +65,7 @@ const Navbar = () => {
         
         {/* Mobile hamburger menu */}
         {isMobile && (
-          <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen} direction="right">
             <DrawerTrigger asChild>
               <button 
                 className="md:hidden focus:outline-none p-1"
@@ -77,7 +77,7 @@ const Navbar = () => {
                 />
               </button>
             </DrawerTrigger>
-            <DrawerContent className="h-[70vh] p-6">
+            <DrawerContent className="h-[70vh] p-6 right-0 left-auto w-[85vw] max-w-md rounded-l-lg">
               <div className="flex justify-end mb-4">
                 <DrawerClose asChild>
                   <button className="p-1 focus:outline-none">
