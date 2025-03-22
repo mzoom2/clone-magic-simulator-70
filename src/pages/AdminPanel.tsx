@@ -56,6 +56,9 @@ const LoginForm = ({ onLogin }: { onLogin: (username: string, password: string) 
                 required
               />
             </div>
+            <div className="text-sm text-gray-500">
+              Default credentials: admin / admin123
+            </div>
           </CardContent>
           <CardFooter>
             <Button 
@@ -93,11 +96,12 @@ const AdminPanelContent = () => {
 
   // Handler for login
   const handleLogin = async (username: string, password: string) => {
+    console.log("Attempting login with:", username);
     const success = await login(username, password);
     if (success) {
       toast.success('Login successful');
     } else {
-      toast.error('Invalid credentials');
+      toast.error('Invalid credentials. Please use admin / admin123');
     }
   };
 

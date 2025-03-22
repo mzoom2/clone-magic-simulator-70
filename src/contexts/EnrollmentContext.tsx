@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -74,12 +73,15 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     const fetchPackages = async () => {
       try {
+        setIsLoading(true);
+        console.log('Fetching packages from:', `${API_URL}/packages`);
         const response = await fetch(`${API_URL}/packages`);
         if (!response.ok) {
           throw new Error('Failed to fetch packages');
         }
         
         const data = await response.json();
+        console.log('Packages fetched:', data);
         setPackages(data);
       } catch (error) {
         console.error('Error fetching packages:', error);
@@ -96,12 +98,14 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('Checking authentication');
         const response = await fetch(`${API_URL}/check-auth`, {
           credentials: 'include'
         });
         
         if (response.ok) {
           const data = await response.json();
+          console.log('Auth check response:', data);
           
           if (data.authenticated) {
             setUser(data.user);
@@ -118,6 +122,7 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
+      console.log('Attempting login to:', `${API_URL}/login`);
       const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -125,11 +130,15 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         credentials: 'include'
       });
 
+      console.log('Login response status:', response.status);
+      
       if (!response.ok) {
         throw new Error('Login failed');
       }
 
       const data = await response.json();
+      console.log('Login response data:', data);
+      
       setUser(data.user);
       setIsAuthenticated(true);
       return true;
@@ -141,6 +150,7 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const logout = async (): Promise<void> => {
     try {
+      console.log('Logging out');
       await fetch(`${API_URL}/logout`, {
         method: 'POST',
         credentials: 'include'
@@ -181,6 +191,7 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   // Function to update package prices via API
   const updatePackagePrices = async (id: string, singlePrice: string, doublePrice: string): Promise<boolean> => {
     try {
+      console.log('Updating package prices:', id, singlePrice, doublePrice);
       const response = await fetch(`${API_URL}/packages/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -213,6 +224,32 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       console.error('Error updating package:', error);
       return false;
     }
+  };
+
+  // Include any missing functions that were replaced by // ... keep existing code
+  const updateContactInfo = (info: Partial<ContactInfo>) => {
+    setContactInfo((prev) => ({ ...prev, ...info }));
+  };
+
+  const resetEnrollment = () => {
+    setSelectedPackage(null);
+    setOccupancyType(null);
+    setVisitorCount(1);
+    setContactInfo(defaultContactInfo);
+  };
+
+  const calculateTotalPrice = (): string => {
+    if (!selectedPackage || !occupancyType) return '0';
+    
+    const basePrice = occupancyType === 'single' 
+      ? selectedPackage.singlePrice 
+      : selectedPackage.doublePrice;
+    
+    // Convert price from string format "1,900" to number, multiply by visitor count, then back to string format
+    const numericPrice = parseFloat(basePrice.replace(/,/g, ''));
+    const totalPrice = numericPrice * visitorCount;
+    
+    return totalPrice.toLocaleString();
   };
 
   return (
