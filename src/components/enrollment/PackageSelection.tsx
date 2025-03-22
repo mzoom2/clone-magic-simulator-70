@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Info } from 'lucide-react';
 import { useEnrollment, PackageInfo } from '@/contexts/EnrollmentContext';
@@ -7,18 +7,36 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const PackageSelection = () => {
   const { packages, setSelectedPackage, setOccupancyType } = useEnrollment();
   const navigate = useNavigate();
+  
+  // Track selected occupancy type for each package
+  const [selectedOccupancies, setSelectedOccupancies] = useState<Record<string, 'single' | 'double' | null>>({});
 
   const handleViewDetails = (route: string) => {
     window.open(route, '_blank');
   };
 
-  const handleSelectPackage = (pkg: PackageInfo, occupancyType: 'single' | 'double') => {
+  const handleSelectOccupancy = (packageId: string, type: 'single' | 'double') => {
+    setSelectedOccupancies(prev => ({
+      ...prev,
+      [packageId]: type
+    }));
+  };
+
+  const handleContinue = (pkg: PackageInfo) => {
+    const selectedType = selectedOccupancies[pkg.id];
+    
+    if (!selectedType) {
+      toast.error("Please select an occupancy type first");
+      return;
+    }
+    
     setSelectedPackage(pkg);
-    setOccupancyType(occupancyType);
+    setOccupancyType(selectedType);
     navigate('/enroll/visitors');
   };
 
@@ -62,21 +80,35 @@ const PackageSelection = () => {
                 <p className="text-sm line-clamp-2">{pkg.description}</p>
                 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 cursor-pointer"
-                       onClick={() => handleSelectPackage(pkg, 'double')}>
-                    <span className="text-sm">Double Occupancy</span>
-                    <span className="font-medium">${pkg.doublePrice}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 cursor-pointer"
-                       onClick={() => handleSelectPackage(pkg, 'single')}>
-                    <span className="text-sm">Single Occupancy</span>
-                    <span className="font-medium">${pkg.singlePrice}</span>
+                  <div className="border rounded-md p-3 bg-gray-50">
+                    <p className="text-sm font-medium mb-2 text-forest">Please select an occupancy type:</p>
+                    
+                    <RadioGroup 
+                      value={selectedOccupancies[pkg.id] || ""}
+                      onValueChange={(value) => handleSelectOccupancy(pkg.id, value as 'single' | 'double')}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center justify-between p-2 rounded-md hover:bg-gray-100">
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value="double" id={`double-${pkg.id}`} />
+                          <Label htmlFor={`double-${pkg.id}`} className="cursor-pointer">Double Occupancy</Label>
+                        </div>
+                        <span className="font-medium">${pkg.doublePrice}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-2 rounded-md hover:bg-gray-100">
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value="single" id={`single-${pkg.id}`} />
+                          <Label htmlFor={`single-${pkg.id}`} className="cursor-pointer">Single Occupancy</Label>
+                        </div>
+                        <span className="font-medium">${pkg.singlePrice}</span>
+                      </div>
+                    </RadioGroup>
                   </div>
                   
                   <div className="pt-2">
                     <Button 
-                      onClick={() => {}}
+                      onClick={() => handleContinue(pkg)}
                       className="bg-forest hover:bg-forest/90 text-white rounded-full w-full mt-2 py-2 h-auto text-sm font-medium"
                     >
                       Continue <ArrowRight size={14} className="ml-1" />
