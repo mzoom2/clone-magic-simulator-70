@@ -54,6 +54,7 @@ const SummerTech = () => {
               title="SUMMER TECH"
               occupancy="Double Occupancy"
               price="1,900"
+              packageId="summer-tech"
               features={[
                 "Conference Access",
                 "2-Night Hotel Stay",
@@ -68,6 +69,7 @@ const SummerTech = () => {
               title="SUMMER TECH"
               occupancy="Single Occupancy"
               price="2,400"
+              packageId="summer-tech"
               features={[
                 "Conference Access",
                 "2-Night Hotel Stay",

@@ -54,6 +54,7 @@ const OctoberTech = () => {
               title="OCTOBER TECH"
               occupancy="Double Occupancy"
               price="2,400"
+              packageId="october-tech"
               features={[
                 "Conference Access",
                 "6-Night Hotel Stay",
@@ -68,6 +69,7 @@ const OctoberTech = () => {
               title="OCTOBER TECH"
               occupancy="Single Occupancy"
               price="3,000"
+              packageId="october-tech"
               features={[
                 "Conference Access",
                 "6-Night Hotel Stay",

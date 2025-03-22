@@ -54,6 +54,7 @@ const LagosArtventure = () => {
               title="LAGOS ARTVENTURE"
               occupancy="Double Occupancy"
               price="2,400"
+              packageId="lagos-artventure"
               features={[
                 "Curated Gallery tours",
                 "VIP Access to Artists & Exhibitors",
@@ -68,6 +69,7 @@ const LagosArtventure = () => {
               title="LAGOS ARTVENTURE"
               occupancy="Single Occupancy"
               price="3,000"
+              packageId="lagos-artventure"
               features={[
                 "Curated Gallery tours",
                 "VIP Access to Artists & Exhibitors",

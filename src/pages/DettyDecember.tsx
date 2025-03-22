@@ -54,6 +54,7 @@ const DettyDecember = () => {
               title="DETTY DECEMBER"
               occupancy="Double Occupancy"
               price="4,300"
+              packageId="detty-december"
               features={[
                 "6-Night Hotel Stay",
                 "Daily Transportation",
@@ -66,6 +67,7 @@ const DettyDecember = () => {
               title="DETTY DECEMBER"
               occupancy="Single Occupancy"
               price="5,000"
+              packageId="detty-december"
               features={[
                 "6-Night Hotel Stay",
                 "Daily Transportation",

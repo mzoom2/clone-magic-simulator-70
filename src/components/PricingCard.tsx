@@ -10,9 +10,10 @@ interface PricingCardProps {
   occupancy: string;
   price: string;
   features: string[];
+  packageId?: string; // New prop to identify which package this card is for
 }
 
-const PricingCard = ({ title, occupancy, price, features }: PricingCardProps) => {
+const PricingCard = ({ title, occupancy, price, features, packageId }: PricingCardProps) => {
   return (
     <Card className="overflow-hidden rounded-none border-none w-full">
       <div className="bg-[#FEF7CD] py-4 md:py-6 text-center">
@@ -40,7 +41,7 @@ const PricingCard = ({ title, occupancy, price, features }: PricingCardProps) =>
           ))}
           <div className="pt-4 md:pt-6 pb-2 text-center">
             <Button asChild className="bg-[#6d2a12] hover:bg-[#6d2a12]/90 text-white rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-sm md:text-base font-medium w-full md:w-auto">
-              <Link to="/enroll">ENROLL NOW</Link>
+              <Link to={packageId ? `/enroll?package=${packageId}` : "/enroll"}>ENROLL NOW</Link>
             </Button>
           </div>
           <div className="text-center text-xs md:text-sm text-gray-600 mt-3 md:mt-4 px-2 md:px-4">

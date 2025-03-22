@@ -54,6 +54,7 @@ const FashionWeek = () => {
               title="FASHION WEEK"
               occupancy="Double Occupancy"
               price="2,400"
+              packageId="fashion-week"
               features={[
                 "Event & Show Access",
                 "6-Night Hotel Stay",
@@ -68,6 +69,7 @@ const FashionWeek = () => {
               title="FASHION WEEK"
               occupancy="Single Occupancy"
               price="3,000"
+              packageId="fashion-week"
               features={[
                 "Event & Show Access",
                 "6-Night Hotel Stay",

@@ -54,6 +54,7 @@ const BehindTheScenes = () => {
               title="BTS with KÁÀBÒ"
               occupancy="Double Occupancy"
               price="2,400"
+              packageId="behind-the-scenes"
               features={[
                 "Conference Access",
                 "6-Night Hotel Stay",
@@ -68,6 +69,7 @@ const BehindTheScenes = () => {
               title="BTS WITH KÁÀBÒ"
               occupancy="Single Occupancy"
               price="3,000"
+              packageId="behind-the-scenes"
               features={[
                 "Conference Access",
                 "6-Night Hotel Stay",
