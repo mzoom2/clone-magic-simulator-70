@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export type PackageInfo = {
   id: string;
@@ -21,19 +22,30 @@ export type ContactInfo = {
   phone: string;
 };
 
+export type UserInfo = {
+  id: number;
+  username: string;
+  is_admin: boolean;
+} | null;
+
 type EnrollmentContextType = {
   packages: PackageInfo[];
   selectedPackage: PackageInfo | null;
   occupancyType: OccupancyType;
   visitorCount: number;
   contactInfo: ContactInfo;
+  isLoading: boolean;
+  user: UserInfo;
+  isAuthenticated: boolean;
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   setSelectedPackage: (pkg: PackageInfo | null) => void;
   setOccupancyType: (type: OccupancyType) => void;
   setVisitorCount: (count: number) => void;
   updateContactInfo: (info: Partial<ContactInfo>) => void;
   resetEnrollment: () => void;
   calculateTotalPrice: () => string;
-  updatePackagePrices?: (id: string, singlePrice: string, doublePrice: string) => void;
+  updatePackagePrices: (id: string, singlePrice: string, doublePrice: string) => Promise<boolean>;
 };
 
 const defaultContactInfo: ContactInfo = {
@@ -43,77 +55,103 @@ const defaultContactInfo: ContactInfo = {
   phone: '',
 };
 
-export const packages: PackageInfo[] = [
-  {
-    id: 'summer-tech',
-    title: 'SUMMER TECH',
-    route: '/catalogue/summer-tech',
-    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    description: "Engage with industry leaders and innovators from across the continent during Africa's biggest open source conference.",
-    singlePrice: '2,400',
-    doublePrice: '1,900',
-    date: 'JUNE 19TH - 21ST, 2025',
-  },
-  {
-    id: 'october-tech',
-    title: 'OCTOBER TECH',
-    route: '/catalogue/october-tech',
-    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    description: "Meet the founders, business leaders, and innovators shaping Africa's tech ecosystem.",
-    singlePrice: '3,000',
-    doublePrice: '2,400',
-    date: 'OCTOBER 13TH - 19TH, 2025',
-  },
-  {
-    id: 'fashion-week',
-    title: 'FASHION WEEK',
-    route: '/catalogue/fashion-week',
-    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    description: "Experience the vibrant fashion scene in Lagos, the fashion capital of Africa.",
-    singlePrice: '3,500',
-    doublePrice: '2,800',
-    date: 'APRIL 25TH - MAY 1ST, 2025',
-  },
-  {
-    id: 'lagos-artventure',
-    title: 'LAGOS ARTVENTURE',
-    route: '/catalogue/lagos-artventure',
-    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    description: "Explore Lagos' vibrant art scene with exclusive gallery access and artist meetings.",
-    singlePrice: '3,200',
-    doublePrice: '2,600',
-    date: 'AUGUST 15TH - 21ST, 2025',
-  },
-  {
-    id: 'behind-the-scenes',
-    title: 'BEHIND THE SCENES',
-    route: '/catalogue/behind-the-scenes',
-    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    description: "Get exclusive access to Nigeria's influential media, entertainment, and creative spaces.",
-    singlePrice: '3,800',
-    doublePrice: '3,100',
-    date: 'SEPTEMBER 10TH - 16TH, 2025',
-  },
-  {
-    id: 'detty-december',
-    title: 'DETTY DECEMBER',
-    route: '/catalogue/detty-december',
-    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    description: "Experience the full excitement of Detty December with exclusive access to Lagos' hottest events.",
-    singlePrice: '5,000',
-    doublePrice: '4,300',
-    date: 'DECEMBER 2025',
-  },
-];
+// Base API URL
+const API_URL = 'http://localhost:5000/api';
 
 const EnrollmentContext = createContext<EnrollmentContextType | undefined>(undefined);
 
 export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [packagesState, setPackagesState] = useState<PackageInfo[]>(packages);
+  const [packages, setPackages] = useState<PackageInfo[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageInfo | null>(null);
   const [occupancyType, setOccupancyType] = useState<OccupancyType>(null);
   const [visitorCount, setVisitorCount] = useState(1);
   const [contactInfo, setContactInfo] = useState<ContactInfo>(defaultContactInfo);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<UserInfo>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Fetch packages from API
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await fetch(`${API_URL}/packages`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch packages');
+        }
+        
+        const data = await response.json();
+        setPackages(data);
+      } catch (error) {
+        console.error('Error fetching packages:', error);
+        toast.error('Failed to load packages. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  // Check authentication status on load
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${API_URL}/check-auth`, {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.authenticated) {
+            setUser(data.user);
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const data = await response.json();
+      setUser(data.user);
+      setIsAuthenticated(true);
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  };
 
   const updateContactInfo = (info: Partial<ContactInfo>) => {
     setContactInfo((prev) => ({ ...prev, ...info }));
@@ -140,32 +178,56 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return totalPrice.toLocaleString();
   };
   
-  // New function to update package prices
-  const updatePackagePrices = (id: string, singlePrice: string, doublePrice: string) => {
-    setPackagesState(prevPackages => 
-      prevPackages.map(pkg => 
-        pkg.id === id ? {...pkg, singlePrice, doublePrice} : pkg
-      )
-    );
-    
-    // If the currently selected package is being updated, also update it
-    if (selectedPackage && selectedPackage.id === id) {
-      setSelectedPackage({
-        ...selectedPackage,
-        singlePrice,
-        doublePrice
+  // Function to update package prices via API
+  const updatePackagePrices = async (id: string, singlePrice: string, doublePrice: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/packages/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ singlePrice, doublePrice }),
+        credentials: 'include'
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update package');
+      }
+      
+      // Update local state
+      setPackages(prevPackages => 
+        prevPackages.map(pkg => 
+          pkg.id === id ? {...pkg, singlePrice, doublePrice} : pkg
+        )
+      );
+      
+      // If the currently selected package is being updated, also update it
+      if (selectedPackage && selectedPackage.id === id) {
+        setSelectedPackage({
+          ...selectedPackage,
+          singlePrice,
+          doublePrice
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating package:', error);
+      return false;
     }
   };
 
   return (
     <EnrollmentContext.Provider
       value={{
-        packages: packagesState,
+        packages,
         selectedPackage,
         occupancyType,
         visitorCount,
         contactInfo,
+        isLoading,
+        user,
+        isAuthenticated,
+        login,
+        logout,
         setSelectedPackage,
         setOccupancyType,
         setVisitorCount,
