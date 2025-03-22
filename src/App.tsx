@@ -17,6 +17,7 @@ import BehindTheScenes from "./pages/BehindTheScenes";
 import DettyDecember from "./pages/DettyDecember";
 import NotFound from "./pages/NotFound";
 import Enroll from "./pages/Enroll";
+import AdminPanel from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/catalogue/detty-december" element={<DettyDecember />} />
           <Route path="/enroll" element={<Enroll />} />
           <Route path="/enroll/:step" element={<Enroll />} />
+          <Route path="/admin" element={<AdminPanel />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

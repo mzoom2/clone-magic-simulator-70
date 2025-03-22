@@ -33,6 +33,7 @@ type EnrollmentContextType = {
   updateContactInfo: (info: Partial<ContactInfo>) => void;
   resetEnrollment: () => void;
   calculateTotalPrice: () => string;
+  updatePackagePrices?: (id: string, singlePrice: string, doublePrice: string) => void;
 };
 
 const defaultContactInfo: ContactInfo = {
@@ -108,6 +109,7 @@ export const packages: PackageInfo[] = [
 const EnrollmentContext = createContext<EnrollmentContextType | undefined>(undefined);
 
 export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [packagesState, setPackagesState] = useState<PackageInfo[]>(packages);
   const [selectedPackage, setSelectedPackage] = useState<PackageInfo | null>(null);
   const [occupancyType, setOccupancyType] = useState<OccupancyType>(null);
   const [visitorCount, setVisitorCount] = useState(1);
@@ -137,11 +139,29 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     return totalPrice.toLocaleString();
   };
+  
+  // New function to update package prices
+  const updatePackagePrices = (id: string, singlePrice: string, doublePrice: string) => {
+    setPackagesState(prevPackages => 
+      prevPackages.map(pkg => 
+        pkg.id === id ? {...pkg, singlePrice, doublePrice} : pkg
+      )
+    );
+    
+    // If the currently selected package is being updated, also update it
+    if (selectedPackage && selectedPackage.id === id) {
+      setSelectedPackage({
+        ...selectedPackage,
+        singlePrice,
+        doublePrice
+      });
+    }
+  };
 
   return (
     <EnrollmentContext.Provider
       value={{
-        packages,
+        packages: packagesState,
         selectedPackage,
         occupancyType,
         visitorCount,
@@ -152,6 +172,7 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         updateContactInfo,
         resetEnrollment,
         calculateTotalPrice,
+        updatePackagePrices,
       }}
     >
       {children}
