@@ -1,130 +1,69 @@
+# Welcome to your Lovable project
 
-# Nigerian Experience Payment Backend
+## Project info
 
-This is a Flask backend for handling payments through Stripe for the Nigerian Experience website.
+**URL**: https://lovable.dev/projects/ca6843b7-bc18-49da-9842-a610a3b2a5da
 
-## Setup
+## How can I edit this code?
 
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+There are several ways of editing your application.
 
-2. Configure your Stripe API key:
-   - Create a `.env` file in the root directory
-   - Add your Stripe secret key: `STRIPE_SECRET_KEY=sk_test_your_key`
+**Use Lovable**
 
-3. Run the application:
-   ```
-   python app.py
-   ```
+Simply visit the [Lovable Project](https://lovable.dev/projects/ca6843b7-bc18-49da-9842-a610a3b2a5da) and start prompting.
 
-The server will start on port 5000.
+Changes made via Lovable will be committed automatically to this repo.
 
-## API Endpoints
+**Use your preferred IDE**
 
-### Create Checkout Session
-- **URL**: `/api/create-checkout-session`
-- **Method**: POST
-- **Description**: Creates a Stripe checkout session and returns the checkout URL
-- **Request Body**:
-  ```json
-  {
-    "packageTitle": "Lagos Experience",
-    "amountInCents": 199900,
-    "visitorCount": 2,
-    "customerName": "John Doe",
-    "customerEmail": "john@example.com",
-    "customerPhone": "+1234567890"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "checkoutUrl": "https://checkout.stripe.com/..."
-  }
-  ```
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-### Verify Payment
-- **URL**: `/api/verify-payment/<session_id>`
-- **Method**: GET
-- **Description**: Verifies the payment status of a completed Stripe checkout session
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "message": "Payment completed successfully"
-  }
-  ```
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-### Get Packages
-- **URL**: `/api/packages`
-- **Method**: GET
-- **Description**: Returns all available experience packages
-- **Response**: Array of package objects
+Follow these steps:
 
-## Admin Endpoints
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-### Admin Login
-- **URL**: `/api/admin/login`
-- **Method**: POST
-- **Description**: Authenticates an admin user
-- **Request Body**:
-  ```json
-  {
-    "username": "admin",
-    "password": "admin123"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "message": "Login successful"
-  }
-  ```
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-### Get Admin Packages
-- **URL**: `/api/admin/packages`
-- **Method**: GET
-- **Description**: Returns all packages (admin authenticated)
-- **Authentication**: Basic Auth (username + password)
-- **Response**: Array of package objects
+# Step 3: Install the necessary dependencies.
+npm i
 
-### Update Package
-- **URL**: `/api/admin/packages/<package_id>`
-- **Method**: PUT
-- **Description**: Updates a package's details (currently only prices)
-- **Authentication**: Basic Auth (username + password)
-- **Request Body**:
-  ```json
-  {
-    "singlePrice": "2,099.00",
-    "doublePrice": "3,899.00"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "message": "Package updated successfully"
-  }
-  ```
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
 
-### Get Bookings
-- **URL**: `/api/bookings`
-- **Method**: GET
-- **Description**: Returns all bookings stored in the system
-- **Authentication**: Basic Auth (username + password)
-- **Response**: Array of booking objects
+**Edit a file directly in GitHub**
 
-## Admin Access
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-Default admin credentials:
-- Username: `admin`
-- Password: `admin123`
+**Use GitHub Codespaces**
 
-## Stripe Webhook (For Production)
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-For a production environment, you should also implement a Stripe webhook to reliably handle payment events.
-This would be added to receive events directly from Stripe rather than relying on the client to verify payment.
+## What technologies are used for this project?
+
+This project is built with .
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+Simply open [Lovable](https://lovable.dev/projects/ca6843b7-bc18-49da-9842-a610a3b2a5da) and click on Share -> Publish.
+
+## I want to use a custom domain - is that possible?
+
+We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)

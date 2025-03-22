@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Info } from 'lucide-react';
-import { useEnrollment, Package } from '@/contexts/EnrollmentContext';
+import { useEnrollment, PackageInfo } from '@/contexts/EnrollmentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -16,10 +16,8 @@ const PackageSelection = () => {
   // Track selected occupancy type for each package
   const [selectedOccupancies, setSelectedOccupancies] = useState<Record<string, 'single' | 'double' | null>>({});
 
-  const handleViewDetails = (route: string | undefined) => {
-    if (route) {
-      window.open(route, '_blank');
-    }
+  const handleViewDetails = (route: string) => {
+    window.open(route, '_blank');
   };
 
   const handleSelectOccupancy = (packageId: string, type: 'single' | 'double') => {
@@ -29,7 +27,7 @@ const PackageSelection = () => {
     }));
   };
 
-  const handleContinue = (pkg: Package) => {
+  const handleContinue = (pkg: PackageInfo) => {
     const selectedType = selectedOccupancies[pkg.id];
     
     if (!selectedType) {

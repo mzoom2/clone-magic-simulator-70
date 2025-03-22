@@ -1,219 +1,178 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-// Package type definition
-export type Package = {
+export type PackageInfo = {
   id: string;
   title: string;
+  route: string;
+  image: string;
   description: string;
-  date: string;
   singlePrice: string;
   doublePrice: string;
-  image: string;
-  route?: string; // Add route property for navigation
+  date: string;
 };
 
-// Initial state for visitor and contact information
-const initialVisitorInfo = {
-  count: 1,
-  pricePerVisitor: '',
-  totalPrice: '',
+export type OccupancyType = 'single' | 'double' | null;
+
+export type ContactInfo = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
 };
 
-const initialContactInfo = {
+type EnrollmentContextType = {
+  packages: PackageInfo[];
+  selectedPackage: PackageInfo | null;
+  occupancyType: OccupancyType;
+  visitorCount: number;
+  contactInfo: ContactInfo;
+  setSelectedPackage: (pkg: PackageInfo | null) => void;
+  setOccupancyType: (type: OccupancyType) => void;
+  setVisitorCount: (count: number) => void;
+  updateContactInfo: (info: Partial<ContactInfo>) => void;
+  resetEnrollment: () => void;
+  calculateTotalPrice: () => string;
+  updatePackagePrices?: (id: string, singlePrice: string, doublePrice: string) => void;
+};
+
+const defaultContactInfo: ContactInfo = {
   firstName: '',
   lastName: '',
   email: '',
   phone: '',
 };
 
-// Context type definition
-type EnrollmentContextType = {
-  currentStep: number;
-  setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-  selectedPackage: Package | null;
-  setSelectedPackage: React.Dispatch<React.SetStateAction<Package | null>>;
-  visitorInfo: typeof initialVisitorInfo;
-  setVisitorInfo: React.Dispatch<React.SetStateAction<typeof initialVisitorInfo>>;
-  contactInfo: typeof initialContactInfo;
-  setContactInfo: React.Dispatch<React.SetStateAction<typeof initialContactInfo>>;
-  packages: Package[];
-  setPackages: React.Dispatch<React.SetStateAction<Package[]>>;
-  updatePackagePrices?: (id: string, singlePrice: string, doublePrice: string) => void;
-  
-  // Add missing properties and methods
-  occupancyType: 'single' | 'double' | null;
-  setOccupancyType: React.Dispatch<React.SetStateAction<'single' | 'double' | null>>;
-  visitorCount: number;
-  setVisitorCount: React.Dispatch<React.SetStateAction<number>>;
-  calculateTotalPrice: () => string;
-  updateContactInfo: (info: typeof initialContactInfo) => void;
-  resetEnrollment: () => void;
-};
+export const packages: PackageInfo[] = [
+  {
+    id: 'summer-tech',
+    title: 'SUMMER TECH',
+    route: '/catalogue/summer-tech',
+    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
+    description: "Engage with industry leaders and innovators from across the continent during Africa's biggest open source conference.",
+    singlePrice: '2,400',
+    doublePrice: '1,900',
+    date: 'JUNE 19TH - 21ST, 2025',
+  },
+  {
+    id: 'october-tech',
+    title: 'OCTOBER TECH',
+    route: '/catalogue/october-tech',
+    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
+    description: "Meet the founders, business leaders, and innovators shaping Africa's tech ecosystem.",
+    singlePrice: '3,000',
+    doublePrice: '2,400',
+    date: 'OCTOBER 13TH - 19TH, 2025',
+  },
+  {
+    id: 'fashion-week',
+    title: 'FASHION WEEK',
+    route: '/catalogue/fashion-week',
+    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
+    description: "Experience the vibrant fashion scene in Lagos, the fashion capital of Africa.",
+    singlePrice: '3,500',
+    doublePrice: '2,800',
+    date: 'APRIL 25TH - MAY 1ST, 2025',
+  },
+  {
+    id: 'lagos-artventure',
+    title: 'LAGOS ARTVENTURE',
+    route: '/catalogue/lagos-artventure',
+    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
+    description: "Explore Lagos' vibrant art scene with exclusive gallery access and artist meetings.",
+    singlePrice: '3,200',
+    doublePrice: '2,600',
+    date: 'AUGUST 15TH - 21ST, 2025',
+  },
+  {
+    id: 'behind-the-scenes',
+    title: 'BEHIND THE SCENES',
+    route: '/catalogue/behind-the-scenes',
+    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
+    description: "Get exclusive access to Nigeria's influential media, entertainment, and creative spaces.",
+    singlePrice: '3,800',
+    doublePrice: '3,100',
+    date: 'SEPTEMBER 10TH - 16TH, 2025',
+  },
+  {
+    id: 'detty-december',
+    title: 'DETTY DECEMBER',
+    route: '/catalogue/detty-december',
+    image: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
+    description: "Experience the full excitement of Detty December with exclusive access to Lagos' hottest events.",
+    singlePrice: '5,000',
+    doublePrice: '4,300',
+    date: 'DECEMBER 2025',
+  },
+];
 
-// Create context with default values
-const EnrollmentContext = createContext<EnrollmentContextType>({
-  currentStep: 1,
-  setCurrentStep: () => {},
-  selectedPackage: null,
-  setSelectedPackage: () => {},
-  visitorInfo: initialVisitorInfo,
-  setVisitorInfo: () => {},
-  contactInfo: initialContactInfo,
-  setContactInfo: () => {},
-  packages: [],
-  setPackages: () => {},
-  
-  // Add missing default values
-  occupancyType: null,
-  setOccupancyType: () => {},
-  visitorCount: 1,
-  setVisitorCount: () => {},
-  calculateTotalPrice: () => "0.00",
-  updateContactInfo: () => {},
-  resetEnrollment: () => {},
-});
+const EnrollmentContext = createContext<EnrollmentContextType | undefined>(undefined);
 
-// Provider component
 export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [visitorInfo, setVisitorInfo] = useState(initialVisitorInfo);
-  const [contactInfo, setContactInfo] = useState(initialContactInfo);
-  const [packages, setPackages] = useState<Package[]>([]);
-  
-  // Add new state variables
-  const [occupancyType, setOccupancyType] = useState<'single' | 'double' | null>(null);
-  const [visitorCount, setVisitorCount] = useState<number>(1);
+  const [packagesState, setPackagesState] = useState<PackageInfo[]>(packages);
+  const [selectedPackage, setSelectedPackage] = useState<PackageInfo | null>(null);
+  const [occupancyType, setOccupancyType] = useState<OccupancyType>(null);
+  const [visitorCount, setVisitorCount] = useState(1);
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(defaultContactInfo);
 
-  useEffect(() => {
-    // Fetch packages from the API
-    const fetchPackages = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/packages');
-        if (!response.ok) {
-          throw new Error('Failed to fetch packages');
-        }
-        const data = await response.json();
-        
-        // Add route property to each package
-        const packagesWithRoutes = data.map((pkg: Package) => {
-          let route = '';
-          if (pkg.id === '1') route = '/catalogue/lagos-experience';
-          else if (pkg.id === '2') route = '/catalogue/abuja-adventure';
-          else if (pkg.id === '3') route = '/catalogue/cultural-immersion';
-          return { ...pkg, route };
-        });
-        
-        setPackages(packagesWithRoutes);
-      } catch (error) {
-        console.error('Error fetching packages:', error);
-        // Fallback to sample data if API fails
-        setPackages([
-          {
-            id: '1',
-            title: 'Lagos Experience',
-            description: 'Experience the vibrant culture of Lagos',
-            date: 'December 2023',
-            singlePrice: '1,999.00',
-            doublePrice: '3,499.00',
-            image: '/lovable-uploads/1bfbcad9-04e3-445e-8d19-840a15a1642a.png',
-            route: '/catalogue/lagos-experience',
-          },
-          {
-            id: '2',
-            title: 'Abuja Adventure',
-            description: 'Explore the beautiful capital city',
-            date: 'January 2024',
-            singlePrice: '1,799.00',
-            doublePrice: '3,299.00',
-            image: '/lovable-uploads/5617c3ad-1f1f-4878-ae9a-40862d14df7b.png',
-            route: '/catalogue/abuja-adventure',
-          },
-          {
-            id: '3',
-            title: 'Cultural Immersion',
-            description: 'Deep dive into Nigerian traditions',
-            date: 'February 2024',
-            singlePrice: '2,099.00',
-            doublePrice: '3,899.00',
-            image: '/lovable-uploads/99d1a1e9-33f0-48d1-884c-3aa027ee3443.png',
-            route: '/catalogue/cultural-immersion',
-          },
-        ]);
-      }
-    };
-
-    fetchPackages();
-  }, []);
-
-  // Function to update package prices
-  const updatePackagePrices = (id: string, singlePrice: string, doublePrice: string) => {
-    setPackages(
-      packages.map((pkg) =>
-        pkg.id === id ? { ...pkg, singlePrice, doublePrice } : pkg
-      )
-    );
+  const updateContactInfo = (info: Partial<ContactInfo>) => {
+    setContactInfo((prev) => ({ ...prev, ...info }));
   };
-  
-  // Function to calculate total price based on occupancy type and visitor count
+
+  const resetEnrollment = () => {
+    setSelectedPackage(null);
+    setOccupancyType(null);
+    setVisitorCount(1);
+    setContactInfo(defaultContactInfo);
+  };
+
   const calculateTotalPrice = (): string => {
-    if (!selectedPackage || !occupancyType) return "0.00";
+    if (!selectedPackage || !occupancyType) return '0';
     
-    // Get the base price without any formatting
     const basePrice = occupancyType === 'single' 
       ? selectedPackage.singlePrice 
       : selectedPackage.doublePrice;
     
-    // Remove commas and convert to number
+    // Convert price from string format "1,900" to number, multiply by visitor count, then back to string format
     const numericPrice = parseFloat(basePrice.replace(/,/g, ''));
+    const totalPrice = numericPrice * visitorCount;
     
-    // Calculate total price
-    const total = numericPrice * visitorCount;
-    
-    // Format the result
-    return total.toLocaleString('en-US', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    });
+    return totalPrice.toLocaleString();
   };
   
-  // Function to update contact information
-  const updateContactInfo = (info: typeof initialContactInfo) => {
-    setContactInfo(info);
-  };
-  
-  // Function to reset enrollment
-  const resetEnrollment = () => {
-    setCurrentStep(1);
-    setSelectedPackage(null);
-    setVisitorInfo(initialVisitorInfo);
-    setContactInfo(initialContactInfo);
-    setOccupancyType(null);
-    setVisitorCount(1);
+  // New function to update package prices
+  const updatePackagePrices = (id: string, singlePrice: string, doublePrice: string) => {
+    setPackagesState(prevPackages => 
+      prevPackages.map(pkg => 
+        pkg.id === id ? {...pkg, singlePrice, doublePrice} : pkg
+      )
+    );
+    
+    // If the currently selected package is being updated, also update it
+    if (selectedPackage && selectedPackage.id === id) {
+      setSelectedPackage({
+        ...selectedPackage,
+        singlePrice,
+        doublePrice
+      });
+    }
   };
 
   return (
     <EnrollmentContext.Provider
       value={{
-        currentStep,
-        setCurrentStep,
+        packages: packagesState,
         selectedPackage,
-        setSelectedPackage,
-        visitorInfo,
-        setVisitorInfo,
-        contactInfo,
-        setContactInfo,
-        packages,
-        setPackages,
-        updatePackagePrices,
         occupancyType,
-        setOccupancyType,
         visitorCount,
+        contactInfo,
+        setSelectedPackage,
+        setOccupancyType,
         setVisitorCount,
-        calculateTotalPrice,
         updateContactInfo,
         resetEnrollment,
+        calculateTotalPrice,
+        updatePackagePrices,
       }}
     >
       {children}
@@ -221,5 +180,10 @@ export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 };
 
-// Custom hook to use the enrollment context
-export const useEnrollment = () => useContext(EnrollmentContext);
+export const useEnrollment = () => {
+  const context = useContext(EnrollmentContext);
+  if (context === undefined) {
+    throw new Error('useEnrollment must be used within an EnrollmentProvider');
+  }
+  return context;
+};
