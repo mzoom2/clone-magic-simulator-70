@@ -9,21 +9,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
 const PackageSelection = () => {
-  const { packages, selectedPackage, setSelectedPackage, occupancyType, setOccupancyType } = useEnrollment();
+  const { packages, setSelectedPackage, setOccupancyType } = useEnrollment();
   const navigate = useNavigate();
-
-  const handlePackageSelect = (pkg: PackageInfo) => {
-    setSelectedPackage(pkg);
-  };
 
   const handleViewDetails = (route: string) => {
     window.open(route, '_blank');
   };
 
-  const handleContinue = () => {
-    if (selectedPackage && occupancyType) {
-      navigate('/enroll/visitors');
-    }
+  const handleSelectPackage = (pkg: PackageInfo, occupancyType: 'single' | 'double') => {
+    setSelectedPackage(pkg);
+    setOccupancyType(occupancyType);
+    navigate('/enroll/visitors');
   };
 
   return (
@@ -36,11 +32,7 @@ const PackageSelection = () => {
         {packages.map((pkg) => (
           <Card 
             key={pkg.id}
-            className={`overflow-hidden transition-all duration-300 border-2 hover:shadow-lg ${
-              selectedPackage?.id === pkg.id 
-                ? 'border-forest ring-2 ring-forest/20' 
-                : 'border-gray-200'
-            }`}
+            className="overflow-hidden transition-all duration-300 border-2 border-gray-200 hover:shadow-lg"
           >
             <div className="relative h-48 overflow-hidden">
               <img 
@@ -69,45 +61,32 @@ const PackageSelection = () => {
                 
                 <p className="text-sm line-clamp-2">{pkg.description}</p>
                 
-                <div className="space-y-2">
-                  <RadioGroup 
-                    value={selectedPackage?.id === pkg.id ? occupancyType || undefined : undefined}
-                    onValueChange={(value) => {
-                      handlePackageSelect(pkg);
-                      setOccupancyType(value as 'single' | 'double');
-                    }}
-                    className="space-y-2"
-                  >
-                    <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
-                      <RadioGroupItem value="double" id={`double-${pkg.id}`} />
-                      <Label htmlFor={`double-${pkg.id}`} className="flex justify-between w-full">
-                        <span>Double Occupancy</span>
-                        <span className="font-medium">${pkg.doublePrice}</span>
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
-                      <RadioGroupItem value="single" id={`single-${pkg.id}`} />
-                      <Label htmlFor={`single-${pkg.id}`} className="flex justify-between w-full">
-                        <span>Single Occupancy</span>
-                        <span className="font-medium">${pkg.singlePrice}</span>
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                       onClick={() => handleSelectPackage(pkg, 'double')}>
+                    <span className="text-sm">Double Occupancy</span>
+                    <span className="font-medium">${pkg.doublePrice}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                       onClick={() => handleSelectPackage(pkg, 'single')}>
+                    <span className="text-sm">Single Occupancy</span>
+                    <span className="font-medium">${pkg.singlePrice}</span>
+                  </div>
+                  
+                  <div className="pt-2">
+                    <Button 
+                      onClick={() => {}}
+                      className="bg-forest hover:bg-forest/90 text-white rounded-full w-full mt-2 py-2 h-auto text-sm font-medium"
+                    >
+                      Continue <ArrowRight size={14} className="ml-1" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
-      </div>
-      
-      <div className="mt-10 text-center">
-        <Button 
-          onClick={handleContinue}
-          disabled={!selectedPackage || !occupancyType}
-          className="bg-forest hover:bg-forest/90 text-white rounded-full px-8 py-6 h-auto text-base font-medium"
-        >
-          Continue <ArrowRight size={16} className="ml-2" />
-        </Button>
       </div>
     </div>
   );
