@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Minus, Plus } from 'lucide-react';
 import { useEnrollment } from '@/contexts/EnrollmentContext';
@@ -20,8 +20,13 @@ const VisitorSelection = () => {
     }
   };
 
+  useEffect(() => {
+    if (!selectedPackage || !occupancyType) {
+      navigate('/enroll');
+    }
+  }, [selectedPackage, occupancyType, navigate]);
+
   if (!selectedPackage || !occupancyType) {
-    navigate('/enroll');
     return null;
   }
 

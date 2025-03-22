@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useParams, Navigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
 import PackageSelection from '@/components/enrollment/PackageSelection';
@@ -13,6 +13,7 @@ import { EnrollmentProvider, useEnrollment, packages } from '@/contexts/Enrollme
 const EnrollmentManager = () => {
   const { step } = useParams<{ step?: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { setSelectedPackage, setOccupancyType } = useEnrollment();
   
   useEffect(() => {
@@ -27,11 +28,11 @@ const EnrollmentManager = () => {
         setSelectedPackage(selectedPkg);
         // By default, set to double occupancy (user can change on next step if needed)
         setOccupancyType('double');
-        // Redirect to visitors selection step
-        window.location.href = '/enroll/visitors';
+        // Redirect to visitors selection step using navigate instead of window.location
+        navigate('/enroll/visitors');
       }
     }
-  }, [location.search, setSelectedPackage, setOccupancyType]);
+  }, [location.search, setSelectedPackage, setOccupancyType, navigate]);
   
   const renderStep = () => {
     switch (step) {

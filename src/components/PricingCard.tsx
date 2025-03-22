@@ -10,10 +10,13 @@ interface PricingCardProps {
   occupancy: string;
   price: string;
   features: string[];
-  packageId?: string; // New prop to identify which package this card is for
+  packageId?: string; // ID to identify which package this card is for
 }
 
 const PricingCard = ({ title, occupancy, price, features, packageId }: PricingCardProps) => {
+  // Determine if this is for single or double occupancy
+  const isDouble = occupancy.toLowerCase().includes('double');
+  
   return (
     <Card className="overflow-hidden rounded-none border-none w-full">
       <div className="bg-[#FEF7CD] py-4 md:py-6 text-center">
