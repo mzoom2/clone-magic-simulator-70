@@ -1,13 +1,18 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { useEnrollment } from '@/contexts/EnrollmentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { initiatePayment, verifyPayment } from '@/services/paymentService';
 
 const OrderSummary = () => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  
   const { 
     selectedPackage, 
     occupancyType, 
@@ -19,6 +24,44 @@ const OrderSummary = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check for payment verification on component mount if session_id is present
+  React.useEffect(() => {
+    if (sessionId) {
+      verifyPaymentStatus(sessionId);
+    }
+  }, [sessionId]);
+
+  const verifyPaymentStatus = async (sid: string) => {
+    try {
+      setIsProcessing(true);
+      const result = await verifyPayment(sid);
+      
+      if (result.success) {
+        toast({
+          title: "Payment Successful!",
+          description: "Your booking has been confirmed. Check your email for details.",
+        });
+        resetEnrollment();
+        navigate('/');
+      } else {
+        toast({
+          title: "Payment Verification Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      toast({
+        title: "Payment Verification Error",
+        description: "There was a problem verifying your payment. Please contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (!selectedPackage || !occupancyType) {
     navigate('/enroll');
     return null;
@@ -28,24 +71,43 @@ const OrderSummary = () => {
     navigate('/enroll/contact');
   };
 
-  const handlePayment = () => {
-    // In a real application, this would integrate with a payment gateway
-    toast({
-      title: "Payment Processing",
-      description: "Your payment is being processed. You will receive a confirmation email soon.",
-    });
-    
-    // After successful payment
-    setTimeout(() => {
+  const handlePayment = async () => {
+    if (!selectedPackage || !contactInfo.email) {
       toast({
-        title: "Booking Confirmed!",
-        description: "Your booking has been confirmed. Check your email for details.",
-        variant: "default",
+        title: "Missing Information",
+        description: "Please complete all required fields before proceeding to payment.",
+        variant: "destructive",
       });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      toast({
+        title: "Processing Payment",
+        description: "Please wait while we redirect you to our secure payment page...",
+      });
+
+      // Call the payment service to initiate payment
+      const checkoutUrl = await initiatePayment(
+        selectedPackage.title,
+        calculateTotalPrice(),
+        visitorCount,
+        contactInfo
+      );
       
-      resetEnrollment();
-      navigate('/');
-    }, 2000);
+      // Redirect to Stripe checkout
+      window.location.href = checkoutUrl;
+      
+    } catch (error) {
+      console.error('Payment initiation error:', error);
+      setIsProcessing(false);
+      toast({
+        title: "Payment Error",
+        description: "There was a problem initiating your payment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -145,6 +207,7 @@ const OrderSummary = () => {
           onClick={handleBack}
           variant="outline"
           className="rounded-full px-6"
+          disabled={isProcessing}
         >
           <ArrowLeft size={16} className="mr-2" /> Back
         </Button>
@@ -152,8 +215,16 @@ const OrderSummary = () => {
         <Button 
           onClick={handlePayment}
           className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black rounded-full px-8 py-6 h-auto text-base font-medium"
+          disabled={isProcessing}
         >
-          Proceed to Payment
+          {isProcessing ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            'Proceed to Payment'
+          )}
         </Button>
       </div>
     </div>

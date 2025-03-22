@@ -43,7 +43,7 @@ const defaultContactInfo: ContactInfo = {
   phone: '',
 };
 
-export const packages: PackageInfo[] = [
+const packagesData: PackageInfo[] = [
   {
     id: 'summer-tech',
     title: 'SUMMER TECH',
@@ -109,7 +109,7 @@ export const packages: PackageInfo[] = [
 const EnrollmentContext = createContext<EnrollmentContextType | undefined>(undefined);
 
 export const EnrollmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [packagesState, setPackagesState] = useState<PackageInfo[]>(packages);
+  const [packagesState, setPackagesState] = useState<PackageInfo[]>(packagesData);
   const [selectedPackage, setSelectedPackage] = useState<PackageInfo | null>(null);
   const [occupancyType, setOccupancyType] = useState<OccupancyType>(null);
   const [visitorCount, setVisitorCount] = useState(1);
@@ -187,3 +187,6 @@ export const useEnrollment = () => {
   }
   return context;
 };
+
+// Make packagesData available for direct import
+export const packages = packagesData;

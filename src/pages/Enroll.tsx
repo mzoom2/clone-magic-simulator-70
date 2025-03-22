@@ -14,7 +14,7 @@ const EnrollmentManager = () => {
   const { step } = useParams<{ step?: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { setSelectedPackage, setOccupancyType } = useEnrollment();
+  const { setSelectedPackage, setOccupancyType, packages } = useEnrollment();
   
   useEffect(() => {
     // Parse package ID from URL query parameters
@@ -32,7 +32,7 @@ const EnrollmentManager = () => {
         navigate('/enroll/visitors');
       }
     }
-  }, [location.search, setSelectedPackage, setOccupancyType, navigate]);
+  }, [location.search, setSelectedPackage, setOccupancyType, navigate, packages]);
   
   const renderStep = () => {
     switch (step) {
