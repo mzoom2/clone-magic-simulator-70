@@ -57,11 +57,72 @@ The server will start on port 5000.
   }
   ```
 
+### Get Packages
+- **URL**: `/api/packages`
+- **Method**: GET
+- **Description**: Returns all available experience packages
+- **Response**: Array of package objects
+
+## Admin Endpoints
+
+### Admin Login
+- **URL**: `/api/admin/login`
+- **Method**: POST
+- **Description**: Authenticates an admin user
+- **Request Body**:
+  ```json
+  {
+    "username": "admin",
+    "password": "admin123"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Login successful"
+  }
+  ```
+
+### Get Admin Packages
+- **URL**: `/api/admin/packages`
+- **Method**: GET
+- **Description**: Returns all packages (admin authenticated)
+- **Authentication**: Basic Auth (username + password)
+- **Response**: Array of package objects
+
+### Update Package
+- **URL**: `/api/admin/packages/<package_id>`
+- **Method**: PUT
+- **Description**: Updates a package's details (currently only prices)
+- **Authentication**: Basic Auth (username + password)
+- **Request Body**:
+  ```json
+  {
+    "singlePrice": "2,099.00",
+    "doublePrice": "3,899.00"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Package updated successfully"
+  }
+  ```
+
 ### Get Bookings
 - **URL**: `/api/bookings`
 - **Method**: GET
 - **Description**: Returns all bookings stored in the system
+- **Authentication**: Basic Auth (username + password)
 - **Response**: Array of booking objects
+
+## Admin Access
+
+Default admin credentials:
+- Username: `admin`
+- Password: `admin123`
 
 ## Stripe Webhook (For Production)
 

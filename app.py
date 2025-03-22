@@ -5,6 +5,9 @@ import stripe
 import os
 import json
 from datetime import datetime
+from werkzeug.security import check_password_hash, generate_password_hash
+import uuid
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -15,6 +18,115 @@ stripe.api_key = "sk_test_your_stripe_secret_key"  # Replace with your actual te
 
 # Store booking data temporarily (in a real app, use a database)
 bookings = []
+
+# Initial packages data
+if not os.path.exists('packages.json'):
+    initial_packages = [
+        {
+            "id": str(uuid.uuid4()),
+            "title": "Lagos Experience",
+            "date": "December 2023",
+            "description": "Experience the vibrant culture of Lagos",
+            "singlePrice": "1,999.00",
+            "doublePrice": "3,499.00",
+            "image": "/lovable-uploads/1bfbcad9-04e3-445e-8d19-840a15a1642a.png"
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "title": "Abuja Adventure",
+            "date": "January 2024",
+            "description": "Explore the beautiful capital city",
+            "singlePrice": "1,799.00",
+            "doublePrice": "3,299.00",
+            "image": "/lovable-uploads/5617c3ad-1f1f-4878-ae9a-40862d14df7b.png"
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "title": "Cultural Immersion",
+            "date": "February 2024",
+            "description": "Deep dive into Nigerian traditions",
+            "singlePrice": "2,099.00",
+            "doublePrice": "3,899.00",
+            "image": "/lovable-uploads/99d1a1e9-33f0-48d1-884c-3aa027ee3443.png"
+        }
+    ]
+    with open('packages.json', 'w') as f:
+        json.dump(initial_packages, f, indent=2)
+
+# Admin credentials (in a real app, use a database and proper authentication)
+# Default username: admin, password: admin123
+admin_credentials = {
+    "username": "admin",
+    "password_hash": generate_password_hash("admin123")
+}
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not auth.username or not auth.password:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        if auth.username != admin_credentials["username"] or not check_password_hash(admin_credentials["password_hash"], auth.password):
+            return jsonify({"error": "Invalid credentials"}), 401
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/api/admin/login', methods=['POST'])
+def admin_login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    if username == admin_credentials["username"] and check_password_hash(admin_credentials["password_hash"], password):
+        return jsonify({"success": True, "message": "Login successful"})
+    else:
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+@app.route('/api/packages', methods=['GET'])
+def get_packages():
+    try:
+        with open('packages.json', 'r') as f:
+            packages = json.load(f)
+        return jsonify(packages)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/packages', methods=['GET'])
+@admin_required
+def admin_get_packages():
+    try:
+        with open('packages.json', 'r') as f:
+            packages = json.load(f)
+        return jsonify(packages)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/packages/<package_id>', methods=['PUT'])
+@admin_required
+def update_package(package_id):
+    try:
+        data = request.json
+        with open('packages.json', 'r') as f:
+            packages = json.load(f)
+        
+        for i, package in enumerate(packages):
+            if package["id"] == package_id:
+                # Only update prices for now
+                if "singlePrice" in data:
+                    packages[i]["singlePrice"] = data["singlePrice"]
+                if "doublePrice" in data:
+                    packages[i]["doublePrice"] = data["doublePrice"]
+                
+                with open('packages.json', 'w') as f:
+                    json.dump(packages, f, indent=2)
+                
+                return jsonify({"success": True, "message": "Package updated successfully"})
+        
+        return jsonify({"error": "Package not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -117,6 +229,7 @@ def verify_payment(session_id):
         }), 500
 
 @app.route('/api/bookings', methods=['GET'])
+@admin_required
 def get_bookings():
     try:
         # Load bookings from file
