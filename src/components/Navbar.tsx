@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -8,8 +9,7 @@ import {
   SheetTrigger,
   SheetClose
 } from "@/components/ui/sheet";
-import { useLocation } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +36,8 @@ const Navbar = () => {
       setActivePage('Our Vision');
     } else if (location.pathname.includes('catalogue')) {
       setActivePage('Catalogue');
+    } else if (location.pathname.includes('enroll')) {
+      setActivePage('Enroll');
     }
   }, [location]);
 
@@ -66,6 +68,8 @@ const Navbar = () => {
         return '/vision';
       case 'Catalogue':
         return '/catalogue';
+      case 'Enroll':
+        return '/enroll';
       default:
         return '/';
     }
@@ -213,24 +217,31 @@ const Navbar = () => {
                   </div>
                 </div>
                 
-                <button className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4">
+                <Link 
+                  to="/enroll"
+                  className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4 text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   ENROLL NOW
-                </button>
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
         )}
         
         {/* Enroll button (only shown on desktop when not using the hamburger) */}
-        <button className={cn(
-          "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300",
-          scrolled 
-            ? "bg-forest text-white hover:bg-opacity-90" 
-            : "bg-white text-forest hover:bg-opacity-90",
-          isMobile ? "hidden" : "block"
-        )}>
+        <Link 
+          to="/enroll"
+          className={cn(
+            "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 text-center",
+            scrolled 
+              ? "bg-forest text-white hover:bg-opacity-90" 
+              : "bg-white text-forest hover:bg-opacity-90",
+            isMobile ? "hidden" : "block"
+          )}
+        >
           ENROLL NOW
-        </button>
+        </Link>
       </div>
     </header>
   );
