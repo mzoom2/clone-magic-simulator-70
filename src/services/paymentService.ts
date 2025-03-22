@@ -5,9 +5,10 @@
 
 /**
  * Initiates a payment session with the backend
- * @param orderId Order identifier
- * @param amount Payment amount in cents
- * @param currency Currency code (default: USD)
+ * @param packageTitle Package title
+ * @param amount Payment amount as string (e.g. "199.99")
+ * @param visitorCount Number of visitors
+ * @param contactInfo Customer contact information
  * @returns The Stripe checkout URL
  */
 export const initiatePayment = async (
