@@ -7,14 +7,14 @@ import PackageSelection from '@/components/enrollment/PackageSelection';
 import VisitorSelection from '@/components/enrollment/VisitorSelection';
 import ContactDetails from '@/components/enrollment/ContactDetails';
 import OrderSummary from '@/components/enrollment/OrderSummary';
-import { EnrollmentProvider, useEnrollment } from '@/contexts/EnrollmentContext';
+import { EnrollmentProvider, useEnrollment, packages } from '@/contexts/EnrollmentContext';
 
 // Create a wrapper component to access the enrollment context
 const EnrollmentManager = () => {
   const { step } = useParams<{ step?: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { setSelectedPackage, setOccupancyType, packages } = useEnrollment();
+  const { setSelectedPackage, setOccupancyType } = useEnrollment();
   
   useEffect(() => {
     // Parse package ID from URL query parameters
@@ -32,7 +32,7 @@ const EnrollmentManager = () => {
         navigate('/enroll/visitors');
       }
     }
-  }, [location.search, setSelectedPackage, setOccupancyType, navigate, packages]);
+  }, [location.search, setSelectedPackage, setOccupancyType, navigate]);
   
   const renderStep = () => {
     switch (step) {
