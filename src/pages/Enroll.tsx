@@ -7,7 +7,7 @@ import PackageSelection from '@/components/enrollment/PackageSelection';
 import VisitorSelection from '@/components/enrollment/VisitorSelection';
 import ContactDetails from '@/components/enrollment/ContactDetails';
 import OrderSummary from '@/components/enrollment/OrderSummary';
-import { EnrollmentProvider, useEnrollment, packages } from '@/contexts/EnrollmentContext';
+import { EnrollmentProvider, useEnrollment } from '@/contexts/EnrollmentContext';
 
 // Create a wrapper component to access the enrollment context
 const EnrollmentManager = () => {
