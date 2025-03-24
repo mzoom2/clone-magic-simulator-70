@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -42,8 +41,8 @@ const Vision = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      {/* Hero Section with Video */}
-      <section className="relative h-[60vh] bg-forest">
+      {/* Hero Section with Video - Increased height from 60vh to 85vh */}
+      <section className="relative h-[85vh] bg-forest">
         <div className="absolute inset-0">
           <video 
             className="w-full h-full object-cover"
