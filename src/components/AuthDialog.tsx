@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -14,227 +16,249 @@ interface AuthDialogProps {
   redirectPath?: string;
 }
 
-const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
-  const [activeTab, setActiveTab] = useState<string>("login");
-  
-  // Login state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  
-  // Register state
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
+const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose, redirectPath }) => {
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
-  
-  const { login, register, isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  
-  // Close dialog automatically if user becomes authenticated
-  useEffect(() => {
-    if (isAuthenticated && isOpen) {
-      // Small delay to ensure stable state before closing
-      const timer = setTimeout(() => {
-        handleSuccessfulAuth();
-      }, 100);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isAuthenticated, isOpen]);
-  
-  // Reset form fields when dialog opens/closes
+  const { login, register, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Clean up form state when dialog closes
   useEffect(() => {
     if (!isOpen) {
-      // Reset form fields when dialog closes
-      setLoginEmail('');
-      setLoginPassword('');
-      setRegisterEmail('');
-      setRegisterPassword('');
+      // Reset form fields if dialog is closed
+      setEmail('');
+      setPassword('');
       setFirstName('');
       setLastName('');
-      setIsLoggingIn(false);
-      setIsRegistering(false);
+      setIsLoading(false);
     }
   }, [isOpen]);
 
-  const handleDialogClose = () => {
-    // Only close if we're not in the middle of authentication
-    if (!isLoggingIn && !isRegistering) {
+  // Redirect if user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && isOpen) {
       onClose();
+      
+      if (redirectPath) {
+        navigate(redirectPath);
+      }
     }
-  };
-
-  const handleSuccessfulAuth = () => {
-    onClose();
-    
-    // If we have a redirectPath, navigate to it
-    if (redirectPath) {
-      // Small delay to ensure dialog is fully closed
-      setTimeout(() => {
-        window.location.href = redirectPath;
-      }, 150);
-    }
-  };
+  }, [isAuthenticated, isOpen, onClose, navigate, redirectPath]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoggingIn(true);
+    
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please enter your email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
     
     try {
-      const success = await login(loginEmail, loginPassword);
-      if (!success) {
-        // Reset loading state but keep dialog open if login fails
-        setIsLoggingIn(false);
+      const success = await login(email, password);
+      
+      if (success) {
+        toast({
+          title: "Success",
+          description: "You have successfully logged in",
+        });
+        
+        if (redirectPath) {
+          navigate(redirectPath);
+        }
+        
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
       }
-      // If success, the useEffect will handle dialog closing
     } catch (error) {
-      console.error("Login error:", error);
-      setIsLoggingIn(false);
+      toast({
+        title: "Error",
+        description: "There was a problem with your login",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsRegistering(true);
+    
+    if (!email || !password || !firstName || !lastName) {
+      toast({
+        title: "Error",
+        description: "Please fill out all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
     
     try {
-      const success = await register(registerEmail, registerPassword, firstName, lastName);
-      if (!success) {
-        // Reset loading state but keep dialog open if registration fails
-        setIsRegistering(false);
+      const success = await register(email, password, firstName, lastName);
+      
+      if (success) {
+        toast({
+          title: "Success",
+          description: "Account created successfully",
+        });
+        
+        if (redirectPath) {
+          navigate(redirectPath);
+        }
+        
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "There was a problem creating your account",
+          variant: "destructive",
+        });
       }
-      // If success, the useEffect will handle dialog closing
     } catch (error) {
-      console.error("Registration error:", error);
-      setIsRegistering(false);
+      toast({
+        title: "Error",
+        description: "There was a problem with registration",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // The rest of the component remains unchanged
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-center">Authentication Required</DialogTitle>
-          <DialogDescription className="text-center">
-            Please log in or create an account to continue with enrollment.
+          <DialogTitle className="text-xl font-serif text-forest">Welcome to Kàábọ̀</DialogTitle>
+          <DialogDescription>
+            {activeTab === 'login' 
+              ? 'Sign in to your account to continue' 
+              : 'Create an account to get started'}
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'register')}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="login">
-            <form onSubmit={handleLogin} className="space-y-4 py-2">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  type="email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
-                <Input
-                  id="login-password"
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  required
-                />
+          <TabsContent value="login" className="space-y-4 mt-4">
+            <form onSubmit={handleLogin}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full bg-forest hover:bg-forest/90"
-                disabled={isLoggingIn}
+                className="w-full mt-6 bg-forest hover:bg-forest/90"
+                disabled={isLoading}
               >
-                {isLoggingIn ? (
+                {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Signing in...
                   </>
                 ) : (
-                  <>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Sign In
-                  </>
+                  'Sign In'
                 )}
               </Button>
             </form>
           </TabsContent>
           
-          <TabsContent value="register">
-            <form onSubmit={handleRegister} className="space-y-4 py-2">
-              <div className="grid grid-cols-2 gap-3">
+          <TabsContent value="register" className="space-y-4 mt-4">
+            <form onSubmit={handleRegister}>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input 
+                      id="firstName" 
+                      placeholder="First name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input 
+                      id="lastName" 
+                      placeholder="Last name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input
-                    id="first-name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
+                  <Label htmlFor="email-register">Email</Label>
+                  <Input 
+                    id="email-register" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input
-                    id="last-name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
+                  <Label htmlFor="password-register">Password</Label>
+                  <Input 
+                    id="password-register" 
+                    type="password" 
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="register-email">Email</Label>
-                <Input
-                  id="register-email"
-                  type="email"
-                  value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="register-password">Password</Label>
-                <Input
-                  id="register-password"
-                  type="password"
-                  value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
-                  required
-                />
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full bg-forest hover:bg-forest/90"
-                disabled={isRegistering}
+                className="w-full mt-6 bg-forest hover:bg-forest/90"
+                disabled={isLoading}
               >
-                {isRegistering ? (
+                {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating account...
                   </>
                 ) : (
-                  <>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Create Account
-                  </>
+                  'Create Account'
                 )}
               </Button>
             </form>
