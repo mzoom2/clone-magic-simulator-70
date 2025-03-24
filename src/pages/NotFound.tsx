@@ -44,6 +44,7 @@ const NotFound = () => {
               <li>• An expired checkout session</li>
               <li>• An incorrect redirect URL</li>
               <li>• A cancelled payment process</li>
+              <li>• Python backend server not running</li>
             </ul>
             <div className="space-y-4">
               <Link 

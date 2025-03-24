@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useStripe } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
@@ -38,39 +37,33 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
     setError(null);
 
     try {
-      // In a real implementation, you would call your backend API to create a Checkout Session
-      // For demonstration, we'll create a mock implementation that simulates success
-      
       // Get the current origin for the success and cancel URLs
       const origin = window.location.origin;
       const successUrl = `${origin}/enroll/payment?payment_status=success`;
       const cancelUrl = `${origin}/enroll/payment?payment_status=canceled`;
       
-      // Mock API call to create checkout session
-      const mockCreateCheckoutSession = async () => {
-        console.log(`Creating checkout session for ${packageTitle} at $${amount}`);
-        console.log(`Success URL: ${successUrl}`);
-        console.log(`Cancel URL: ${cancelUrl}`);
-        
-        // In production, you'd replace this with an actual API call to your server
-        // that creates a real Stripe Checkout Session with proper success_url and cancel_url
-        return new Promise<{ url: string }>((resolve) => {
-          setTimeout(() => {
-            // In a real implementation, Stripe would append the session ID to these URLs
-            // Here we're just simulating the redirect back with payment_status
-            resolve({ 
-              // In production, this would be the Stripe Checkout URL that includes success_url and cancel_url
-              url: `https://checkout.stripe.com/c/pay/cs_test_mock_${Math.random().toString(36).substr(2, 9)}?success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}#fidkdWxOYHwnPyd1blppbHNgWm1NSTQ0UEBPQExuYTJAMzI1TGdpQnZQUnxuQjdVXUhdUE10PVR%2FNmFKZzVqVH9gYmdiPWA0NTVdYGBrNWRgQCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYCkndXdgaWpkYUNqa3EnPydXamdqcWoneCUl`
-            });
-          }, 1000);
-        });
-      };
-
-      // Get checkout URL from backend
-      const { url } = await mockCreateCheckoutSession();
+      // Make request to Python backend to create checkout session
+      const response = await fetch('http://localhost:5000/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          package_title: packageTitle,
+          amount_cents: getAmountInCents(),
+          success_url: successUrl,
+          cancel_url: cancelUrl
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+      
+      const { checkout_url } = await response.json();
       
       // Redirect to Stripe Checkout
-      window.location.href = url;
+      window.location.href = checkout_url;
     } catch (err) {
       console.error('Error initiating checkout:', err);
       setError('An unexpected error occurred. Please try again.');
