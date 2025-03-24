@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import BackToTop from './BackToTop';
 
 const experiences = [
   {
@@ -178,6 +179,7 @@ const Experience = () => {
           </div>
         </div>
       </div>
+      <BackToTop />
     </section>
   );
 };

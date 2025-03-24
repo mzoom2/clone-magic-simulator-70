@@ -94,6 +94,22 @@
       opacity: 1;
     }
   }
+  
+  /* Added animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
 }
 
 @layer components {
@@ -115,5 +131,14 @@
   
   .form-input {
     @apply w-full p-3 bg-white rounded-md border border-sand focus:border-forest focus:outline-none focus:ring-1 focus:ring-forest transition-all duration-300;
+  }
+  
+  /* Added animation classes */
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md;
   }
 }
