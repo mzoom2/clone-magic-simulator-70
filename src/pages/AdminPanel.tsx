@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -159,19 +158,31 @@ const TransactionManagement = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`attended-${transaction.id}`}
-                          checked={transaction.attended}
-                          onCheckedChange={(checked) => handleAttendanceChange(transaction.id, checked)}
-                          disabled={transaction.status !== 'completed'}
-                          className="cursor-pointer"
-                        />
-                        <label 
-                          htmlFor={`attended-${transaction.id}`}
-                          className="text-sm cursor-pointer"
-                        >
-                          {transaction.attended ? 'Yes' : 'No'}
-                        </label>
+                        {transaction.status === 'completed' ? (
+                          <>
+                            <Checkbox 
+                              id={`attended-${transaction.id}`}
+                              checked={transaction.attended}
+                              onCheckedChange={(checked) => {
+                                console.log('Checkbox clicked:', checked);
+                                handleAttendanceChange(transaction.id, checked);
+                              }}
+                            />
+                            <label 
+                              htmlFor={`attended-${transaction.id}`}
+                              className="text-sm cursor-pointer"
+                              onClick={() => {
+                                const newValue = !transaction.attended;
+                                console.log('Label clicked, setting to:', newValue);
+                                handleAttendanceChange(transaction.id, newValue);
+                              }}
+                            >
+                              {transaction.attended ? 'Yes' : 'No'}
+                            </label>
+                          </>
+                        ) : (
+                          <span className="text-sm text-gray-500">N/A</span>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
