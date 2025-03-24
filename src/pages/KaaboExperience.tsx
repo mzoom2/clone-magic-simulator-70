@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ChevronRight, Check, Plus, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const KaaboExperience = () => {
   return (
@@ -35,8 +37,12 @@ const KaaboExperience = () => {
             Get the full Kàábọ̀ experience with our all inclusive multi-day packages. 
             Hotel, daily transport, activities, and even optional visa facilitation — it's all covered. Pick what suits you best.
           </p>
-          <Button variant="outline" className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 rounded-full">
-            EXPLORE NOW · BOOK NOW
+          <Button 
+            variant="outline" 
+            className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 rounded-full"
+            onClick={() => window.location.href = '/enroll'}
+          >
+            BOOK NOW
           </Button>
         </div>
       </section>
@@ -80,8 +86,11 @@ const KaaboExperience = () => {
                     </li>
                   </ul>
                   
-                  <Button className="bg-forest hover:bg-forest/90 text-white">
-                    EXPLORE MORE
+                  <Button 
+                    className="bg-forest hover:bg-forest/90 text-white"
+                    onClick={() => window.location.href = '/enroll'}
+                  >
+                    BOOK NOW
                   </Button>
                   
                   <p className="mt-4 text-xs text-muted-foreground px-4">
@@ -126,8 +135,11 @@ const KaaboExperience = () => {
                     </li>
                   </ul>
                   
-                  <Button className="bg-forest hover:bg-forest/90 text-white">
-                    EXPLORE MORE
+                  <Button 
+                    className="bg-forest hover:bg-forest/90 text-white"
+                    onClick={() => window.location.href = '/enroll'}
+                  >
+                    BOOK NOW
                   </Button>
                   
                   <p className="mt-4 text-xs text-muted-foreground px-4">
@@ -188,8 +200,9 @@ const KaaboExperience = () => {
                 <Button 
                   variant="outline" 
                   className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
+                  onClick={() => window.location.href = '/enroll'}
                 >
-                  DISCOVER
+                  BOOK NOW
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
@@ -209,8 +222,9 @@ const KaaboExperience = () => {
                 <Button 
                   variant="outline" 
                   className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
+                  onClick={() => window.location.href = '/enroll'}
                 >
-                  DISCOVER
+                  BOOK NOW
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
@@ -230,8 +244,9 @@ const KaaboExperience = () => {
                 <Button 
                   variant="outline" 
                   className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
+                  onClick={() => window.location.href = '/enroll'}
                 >
-                  DISCOVER
+                  BOOK NOW
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
