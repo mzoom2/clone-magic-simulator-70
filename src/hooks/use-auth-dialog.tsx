@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export const useAuthDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const lastClosedTime = useRef(0);
   const hasBeenAuthenticated = useRef(isAuthenticated);
   

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode, useEffect, useRef } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import AuthDialog from '@/components/AuthDialog';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,15 +35,13 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
   } = useAuthDialog();
   
   const { isAuthenticated } = useAuth();
-  const previousAuthState = useRef(isAuthenticated);
   
-  // Handle authentication state changes
+  // Close the dialog when auth state changes
   useEffect(() => {
-    if (previousAuthState.current !== isAuthenticated) {
-      // Update the previous auth state
-      previousAuthState.current = isAuthenticated;
+    if (isAuthenticated && isDialogOpen) {
+      closeAuthDialog();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isDialogOpen, closeAuthDialog]);
   
   return (
     <AuthDialogContext.Provider
