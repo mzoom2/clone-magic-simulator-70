@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
@@ -29,12 +30,19 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
   // Add state to track the previous page
   const [previousPage, setPreviousPage] = useState<string | null>(null);
 
+  // Close dialog automatically if user becomes authenticated
+  useEffect(() => {
+    if (isAuthenticated && isOpen) {
+      handleSuccessfulAuth();
+    }
+  }, [isAuthenticated, isOpen]);
+  
   // Store the previous page when the dialog opens
   useEffect(() => {
     if (isOpen && !previousPage) {
@@ -57,6 +65,15 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     onClose();
   };
 
+  const handleSuccessfulAuth = () => {
+    onClose();
+    
+    // Navigate to redirect path if provided, otherwise stay on current page
+    if (redirectPath) {
+      window.location.href = redirectPath;
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
@@ -68,12 +85,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           title: "Login successful",
           description: "You are now logged in",
         });
-        onClose();
-        
-        // Navigate to redirect path if provided
-        if (redirectPath) {
-          window.location.href = redirectPath;
-        }
+        handleSuccessfulAuth();
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -93,12 +105,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           title: "Registration successful",
           description: "Your account has been created and you are now logged in",
         });
-        onClose();
-        
-        // Navigate to redirect path if provided
-        if (redirectPath) {
-          window.location.href = redirectPath;
-        }
+        handleSuccessfulAuth();
       }
     } catch (error) {
       console.error("Registration error:", error);

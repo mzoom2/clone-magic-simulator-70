@@ -1,11 +1,18 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useAuthDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
   const { isAuthenticated } = useAuth();
+  
+  // Close dialog if user becomes authenticated
+  useEffect(() => {
+    if (isAuthenticated && isDialogOpen) {
+      closeAuthDialog();
+    }
+  }, [isAuthenticated, isDialogOpen]);
   
   const openAuthDialog = (path?: string) => {
     if (path) {

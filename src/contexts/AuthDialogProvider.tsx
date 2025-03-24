@@ -1,7 +1,8 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import AuthDialog from '@/components/AuthDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthDialogContextType {
   openAuthDialog: (redirectPath?: string) => void;
@@ -31,6 +32,15 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
     closeAuthDialog,
     checkAuthAndProceed
   } = useAuthDialog();
+  
+  const { isAuthenticated } = useAuth();
+  
+  // Close the dialog if user becomes authenticated
+  useEffect(() => {
+    if (isAuthenticated && isDialogOpen) {
+      closeAuthDialog();
+    }
+  }, [isAuthenticated, isDialogOpen]);
   
   return (
     <AuthDialogContext.Provider

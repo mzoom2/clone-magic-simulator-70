@@ -99,12 +99,13 @@ const EnrollmentManager = () => {
   const { checkAuthAndProceed } = useAuthDialogContext();
   
   useEffect(() => {
-    // Check if user is authenticated
+    // Check if user is authenticated, but only show the dialog if not authenticated
+    // This prevents showing the dialog after a user has just registered or logged in
     if (!isAuthenticated) {
       checkAuthAndProceed('/enroll', () => {
         // This callback won't execute since the user isn't authenticated yet
-        // When the user successfully logs in, they'll be redirected back here
       });
+      return; // Exit early if not authenticated
     }
     
     // Parse package ID from URL query parameters
