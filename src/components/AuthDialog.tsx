@@ -34,18 +34,33 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   
   // Add state to track the previous page
   const [previousPage, setPreviousPage] = useState<string | null>(null);
+  const [dialogClosed, setDialogClosed] = useState(false);
 
   // Close dialog automatically if user becomes authenticated
   useEffect(() => {
-    if (isAuthenticated && isOpen) {
+    if (isAuthenticated && isOpen && !dialogClosed) {
       handleSuccessfulAuth();
+      setDialogClosed(true);
     }
-  }, [isAuthenticated, isOpen]);
+  }, [isAuthenticated, isOpen, dialogClosed]);
   
-  // Store the previous page when the dialog opens
+  // Reset internal state when dialog opens/closes
   useEffect(() => {
-    if (isOpen && !previousPage) {
-      setPreviousPage(document.referrer || '/');
+    if (isOpen) {
+      setDialogClosed(false);
+      if (!previousPage) {
+        setPreviousPage(document.referrer || '/');
+      }
+    } else {
+      // Reset form fields when dialog closes
+      setLoginEmail('');
+      setLoginPassword('');
+      setRegisterEmail('');
+      setRegisterPassword('');
+      setFirstName('');
+      setLastName('');
+      setIsLoggingIn(false);
+      setIsRegistering(false);
     }
   }, [isOpen, previousPage]);
 

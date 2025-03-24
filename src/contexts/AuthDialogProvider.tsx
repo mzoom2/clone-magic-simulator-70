@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect, useRef } from 'react';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import AuthDialog from '@/components/AuthDialog';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,13 +35,26 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
   } = useAuthDialog();
   
   const { isAuthenticated } = useAuth();
+  const authCheckPerformed = useRef(false);
   
   // Close the dialog if user becomes authenticated
   useEffect(() => {
     if (isAuthenticated && isDialogOpen) {
       closeAuthDialog();
+      authCheckPerformed.current = true;
     }
-  }, [isAuthenticated, isDialogOpen]);
+  }, [isAuthenticated, isDialogOpen, closeAuthDialog]);
+  
+  // Prevent reopening the dialog immediately after authentication
+  useEffect(() => {
+    if (isAuthenticated && authCheckPerformed.current) {
+      const timeoutId = setTimeout(() => {
+        authCheckPerformed.current = false;
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isAuthenticated]);
   
   return (
     <AuthDialogContext.Provider
