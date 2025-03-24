@@ -26,7 +26,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
 
   const handleCheckout = async () => {
     if (!stripe) {
-      // Stripe.js has not loaded yet
+      toast({
+        title: "Stripe Not Loaded",
+        description: "Please wait a moment and try again.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -35,36 +39,30 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
 
     try {
       // In a real implementation, you would call your backend API to create a Checkout Session
-      // For demonstration, we'll simulate this process
+      // For demonstration, we'll create a mock implementation that simulates success
       
       // Mock API call to create checkout session
-      const createCheckoutSession = async () => {
-        return new Promise<{ sessionId: string }>((resolve) => {
-          // In production, you'd make a real API call to your server here
+      const mockCreateCheckoutSession = async () => {
+        console.log(`Creating checkout session for ${packageTitle} at $${amount}`);
+        
+        // In production, you'd replace this with an actual API call to your server
+        // that creates a real Stripe Checkout Session
+        return new Promise<{ url: string }>((resolve) => {
           setTimeout(() => {
+            // Instead of returning a sessionId, return a URL
+            // In production this would be the Stripe Checkout URL from your backend
             resolve({ 
-              sessionId: 'cs_test_' + Math.random().toString(36).substr(2, 9) 
+              url: `https://checkout.stripe.com/c/pay/cs_test_mock_${Math.random().toString(36).substr(2, 9)}#fidkdWxOYHwnPyd1blppbHNgWm1NSTQ0UEBPQExuYTJAMzI1TGdpQnZQUnxuQjdVXUhdUE10PVR%2FNmFKZzVqVH9gYmdiPWA0NTVdYGBrNWRgQCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYCkndXdgaWpkYUNqa3EnPydXamdqcWoneCUl`
             });
           }, 1000);
         });
       };
 
-      // Get checkout session ID from backend
-      const { sessionId } = await createCheckoutSession();
+      // Get checkout URL from backend
+      const { url } = await mockCreateCheckoutSession();
       
       // Redirect to Stripe Checkout
-      const { error } = await stripe.redirectToCheckout({
-        sessionId: sessionId
-      });
-
-      if (error) {
-        setError(error.message || 'An error occurred during checkout');
-        toast({
-          title: "Checkout Failed",
-          description: error.message || 'Something went wrong with the checkout process',
-          variant: "destructive",
-        });
-      }
+      window.location.href = url;
     } catch (err) {
       console.error('Error initiating checkout:', err);
       setError('An unexpected error occurred. Please try again.');

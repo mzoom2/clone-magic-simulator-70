@@ -9,16 +9,27 @@ const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 interface StripeProviderProps {
   children: React.ReactNode;
   options?: {
-    locale?: string;
-    appearance?: any;
+    locale?: 'auto' | 'de' | 'en' | 'es' | 'fr' | 'it' | 'ja' | 'nl' | 'pl' | 'pt' | 'zh';
+    appearance?: {
+      theme?: 'stripe' | 'night' | 'flat' | 'none';
+      variables?: {
+        colorPrimary?: string;
+        colorBackground?: string;
+        colorText?: string;
+        colorDanger?: string;
+        fontFamily?: string;
+        spacingUnit?: string;
+        borderRadius?: string;
+      };
+    };
   };
 }
 
 const StripeProvider: React.FC<StripeProviderProps> = ({ children, options }) => {
   const defaultOptions = {
-    locale: 'en',
+    locale: 'en' as const,
     appearance: {
-      theme: 'stripe',
+      theme: 'stripe' as const,
       variables: {
         colorPrimary: '#0f172a',
         colorBackground: '#ffffff',
