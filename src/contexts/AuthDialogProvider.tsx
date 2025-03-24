@@ -44,6 +44,17 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
     if (isAuthenticated && !wasAuthenticated.current) {
       wasAuthenticated.current = true;
       authCheckPerformed.current = true;
+      
+      // Store authentication status in browser storage
+      sessionStorage.setItem('auth_dialog_closed', 'true');
+    }
+  }, [isAuthenticated]);
+  
+  // Check localStorage on mount to prevent reopening after page refresh
+  useEffect(() => {
+    if (isAuthenticated) {
+      // If user is authenticated, ensure we don't show the dialog
+      sessionStorage.setItem('auth_dialog_closed', 'true');
     }
   }, [isAuthenticated]);
   

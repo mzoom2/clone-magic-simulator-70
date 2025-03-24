@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,9 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     if (isAuthenticated && isOpen && !processingAuth) {
       setProcessingAuth(true);
       handleSuccessfulAuth();
+      
+      // Save to session storage that auth was successful
+      sessionStorage.setItem('auth_dialog_closed', 'true');
     }
   }, [isAuthenticated, isOpen]);
   
@@ -74,6 +78,8 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     // Only close if we're not in the middle of authentication
     if (!isLoggingIn && !isRegistering) {
       onClose();
+      // Save that dialog was closed by user
+      sessionStorage.setItem('auth_dialog_closed', 'true');
     }
   };
 
@@ -84,6 +90,9 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     }
     
     onClose();
+    
+    // Save authentication state to browser
+    sessionStorage.setItem('auth_dialog_closed', 'true');
     
     // Navigate to redirect path if provided, otherwise stay on current page
     if (redirectPath) {
@@ -106,6 +115,9 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           description: "You are now logged in",
         });
         handleSuccessfulAuth();
+        
+        // Save authentication state to browser
+        sessionStorage.setItem('auth_dialog_closed', 'true');
       } else {
         setProcessingAuth(false);
       }
@@ -129,6 +141,9 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           description: "Your account has been created and you are now logged in",
         });
         handleSuccessfulAuth();
+        
+        // Save authentication state to browser
+        sessionStorage.setItem('auth_dialog_closed', 'true');
       } else {
         setProcessingAuth(false);
       }
