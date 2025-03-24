@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,7 +20,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Clock, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Transaction {
@@ -35,10 +34,11 @@ interface Transaction {
 }
 
 const DashboardPage = () => {
-  const { user, token, refreshUserData } = useAuth();
+  const { user, token, refreshUserData, logout } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     refreshUserData();
@@ -103,13 +103,32 @@ const DashboardPage = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    toast({
+      title: 'Logged out successfully',
+      description: 'You have been logged out of your account.',
+    });
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
       <main className="flex-grow pt-24 pb-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-forest mb-6">Dashboard</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-forest">Dashboard</h1>
+            <Button 
+              variant="outline" 
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              <LogOut size={18} />
+              Logout
+            </Button>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>

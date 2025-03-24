@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Sheet,
@@ -9,19 +9,24 @@ import {
   SheetTrigger,
   SheetClose
 } from "@/components/ui/sheet";
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "./ui/button";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, logout, user } = useAuth();
+  const navigate = useNavigate();
   
   // Determine active page based on route
   const [activePage, setActivePage] = useState('Home');
@@ -94,6 +99,11 @@ const Navbar = () => {
   const navbarBackground = scrolled || !hasHeroSection
     ? "bg-white/80 shadow-sm backdrop-blur-md"
     : "bg-black/30 backdrop-blur-sm";
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <header 
@@ -227,32 +237,80 @@ const Navbar = () => {
                     ))}
                   </div>
                 </div>
-                
-                <Link 
-                  to="/enroll"
-                  className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4 text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  ENROLL NOW
-                </Link>
+
+                {isAuthenticated ? (
+                  <>
+                    <Link 
+                      to="/dashboard"
+                      className="flex items-center gap-2 text-lg font-medium hover:text-forest transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <User size={18} />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2 text-lg font-medium text-red-600 hover:text-red-700 transition-colors"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link 
+                    to="/enroll"
+                    className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4 text-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    ENROLL NOW
+                  </Link>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
         )}
         
-        {/* Enroll button (only shown on desktop when not using the hamburger) */}
-        <Link 
-          to="/enroll"
-          className={cn(
-            "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 text-center",
-            scrolled || !hasHeroSection 
-              ? "bg-forest text-white hover:bg-opacity-90" 
-              : "bg-white text-forest hover:bg-opacity-90",
-            isMobile ? "hidden" : "block"
+        {/* Desktop action buttons */}
+        <div className={cn("flex items-center gap-4", isMobile ? "hidden" : "flex")}>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                className="flex items-center gap-2 hover:text-forest"
+                asChild
+              >
+                <Link to="/dashboard">
+                  <User size={18} />
+                  Dashboard
+                </Link>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                onClick={handleLogout}
+              >
+                <LogOut size={18} />
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Link 
+              to="/enroll"
+              className={cn(
+                "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 text-center",
+                scrolled || !hasHeroSection 
+                  ? "bg-forest text-white hover:bg-opacity-90" 
+                  : "bg-white text-forest hover:bg-opacity-90"
+              )}
+            >
+              ENROLL NOW
+            </Link>
           )}
-        >
-          ENROLL NOW
-        </Link>
+        </div>
       </div>
     </header>
   );
