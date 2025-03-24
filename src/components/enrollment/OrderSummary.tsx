@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check, CreditCard } from 'lucide-react';
 import { useEnrollment } from '@/contexts/EnrollmentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 
 const OrderSummary = () => {
   const { 
@@ -14,10 +13,8 @@ const OrderSummary = () => {
     visitorCount, 
     contactInfo,
     calculateTotalPrice,
-    resetEnrollment
   } = useEnrollment();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   if (!selectedPackage || !occupancyType) {
     navigate('/enroll');
@@ -28,24 +25,8 @@ const OrderSummary = () => {
     navigate('/enroll/contact');
   };
 
-  const handlePayment = () => {
-    // In a real application, this would integrate with a payment gateway
-    toast({
-      title: "Payment Processing",
-      description: "Your payment is being processed. You will receive a confirmation email soon.",
-    });
-    
-    // After successful payment
-    setTimeout(() => {
-      toast({
-        title: "Booking Confirmed!",
-        description: "Your booking has been confirmed. Check your email for details.",
-        variant: "default",
-      });
-      
-      resetEnrollment();
-      navigate('/');
-    }, 2000);
+  const handleProceedToPayment = () => {
+    navigate('/enroll/payment');
   };
 
   return (
@@ -150,9 +131,10 @@ const OrderSummary = () => {
         </Button>
         
         <Button 
-          onClick={handlePayment}
-          className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black rounded-full px-8 py-6 h-auto text-base font-medium"
+          onClick={handleProceedToPayment}
+          className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black rounded-full px-8 py-6 h-auto text-base font-medium group"
         >
+          <CreditCard className="mr-2 h-4 w-4" />
           Proceed to Payment
         </Button>
       </div>

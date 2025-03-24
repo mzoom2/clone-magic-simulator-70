@@ -7,6 +7,7 @@ import PackageSelection from '@/components/enrollment/PackageSelection';
 import VisitorSelection from '@/components/enrollment/VisitorSelection';
 import ContactDetails from '@/components/enrollment/ContactDetails';
 import OrderSummary from '@/components/enrollment/OrderSummary';
+import Payment from '@/components/enrollment/Payment';
 import { EnrollmentProvider, useEnrollment, packages } from '@/contexts/EnrollmentContext';
 import { Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,7 +18,8 @@ const StepIndicator = ({ currentStep }: { currentStep: string }) => {
     { id: 'package', label: 'Package' },
     { id: 'visitors', label: 'Visitors' },
     { id: 'contact', label: 'Contact' },
-    { id: 'summary', label: 'Summary' }
+    { id: 'summary', label: 'Summary' },
+    { id: 'payment', label: 'Payment' }
   ];
   
   const getCurrentStepIndex = () => {
@@ -25,6 +27,7 @@ const StepIndicator = ({ currentStep }: { currentStep: string }) => {
       case 'visitors': return 1;
       case 'contact': return 2;
       case 'summary': return 3;
+      case 'payment': return 4;
       default: return 0;
     }
   };
@@ -117,6 +120,8 @@ const EnrollmentManager = () => {
         return <ContactDetails />;
       case 'summary':
         return <OrderSummary />;
+      case 'payment':
+        return <Payment />;
       default:
         return <PackageSelection />;
     }
