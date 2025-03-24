@@ -1,7 +1,7 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useEnrollment } from '@/contexts/EnrollmentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -19,32 +19,45 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
 
   // Handle return from Stripe Checkout
   useEffect(() => {
     // Check for success or cancel status from Stripe redirect
     const query = new URLSearchParams(location.search);
-    const paymentStatus = query.get('payment_status');
+    const status = query.get('payment_status');
     
-    if (paymentStatus === 'success') {
+    console.log('Payment component loaded. URL params:', location.search);
+    console.log('Payment status from URL:', status);
+    
+    if (status === 'success') {
+      setPaymentStatus('success');
       toast({
         title: "Payment Successful!",
         description: "Your booking has been confirmed. Thank you for choosing us!",
       });
       
-      // Reset enrollment and redirect
-      resetEnrollment();
+      // Reset enrollment and redirect to home after delay
       setTimeout(() => {
+        resetEnrollment();
         navigate('/');
-      }, 2000);
-    } else if (paymentStatus === 'canceled') {
+      }, 3000);
+    } else if (status === 'canceled') {
+      setPaymentStatus('canceled');
       toast({
         title: "Payment Canceled",
         description: "Your payment was not completed. You can try again.",
         variant: "destructive",
       });
+    } else if (status === 'error') {
+      setPaymentStatus('error');
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
     }
-  }, [location, toast, navigate, resetEnrollment]);
+  }, [location.search, toast, navigate, resetEnrollment]);
 
   if (!selectedPackage || !occupancyType) {
     navigate('/enroll');
@@ -57,8 +70,126 @@ const Payment = () => {
 
   const handlePaymentSuccess = () => {
     // This will be triggered when we handle redirect back from Stripe
-    // The actual success is handled in the useEffect above
     console.log('Payment initiated');
+  };
+
+  // Render different content based on payment status
+  const renderContent = () => {
+    switch (paymentStatus) {
+      case 'success':
+        return (
+          <Card className="border-2 border-green-200 mb-8 bg-green-50">
+            <CardHeader className="p-6 pb-4">
+              <div className="flex justify-center mb-4">
+                <CheckCircle size={48} className="text-green-500" />
+              </div>
+              <CardTitle className="text-xl font-semibold text-center">Payment Successful!</CardTitle>
+              <CardDescription className="text-center mt-2">
+                Your booking for {selectedPackage.title} has been confirmed.
+                <br />You will be redirected to the home page shortly.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        );
+      
+      case 'canceled':
+        return (
+          <Card className="border-2 border-orange-200 mb-8 bg-orange-50">
+            <CardHeader className="p-6 pb-4">
+              <div className="flex justify-center mb-4">
+                <AlertCircle size={48} className="text-orange-500" />
+              </div>
+              <CardTitle className="text-xl font-semibold text-center">Payment Canceled</CardTitle>
+              <CardDescription className="text-center mt-2">
+                Your payment was not completed. You can try again below.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CheckoutForm 
+                amount={calculateTotalPrice()} 
+                packageTitle={selectedPackage.title}
+                onSuccess={handlePaymentSuccess}
+              />
+            </CardContent>
+          </Card>
+        );
+      
+      case 'error':
+        return (
+          <Card className="border-2 border-red-200 mb-8 bg-red-50">
+            <CardHeader className="p-6 pb-4">
+              <div className="flex justify-center mb-4">
+                <AlertCircle size={48} className="text-red-500" />
+              </div>
+              <CardTitle className="text-xl font-semibold text-center">Payment Failed</CardTitle>
+              <CardDescription className="text-center mt-2">
+                There was an error processing your payment. Please try again.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <CheckoutForm 
+                amount={calculateTotalPrice()} 
+                packageTitle={selectedPackage.title}
+                onSuccess={handlePaymentSuccess}
+              />
+            </CardContent>
+          </Card>
+        );
+      
+      default:
+        return (
+          <Card className="border-2 border-gray-200 mb-8">
+            <CardHeader className="p-6 pb-0">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-xl font-semibold text-forest">{selectedPackage.title}</CardTitle>
+                <span className="text-xl font-bold text-forest">${calculateTotalPrice()}</span>
+              </div>
+              <CardDescription className="text-gray-600 mt-2">
+                Secure payment powered by Stripe
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="p-6">
+              <div className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-gray-700">Package Details</h4>
+                    <p className="text-sm text-gray-600">{selectedPackage.description}</p>
+                    <p className="text-sm text-gray-600 font-semibold">{selectedPackage.date}</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-gray-700">Payment Methods</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="bg-gray-100 p-2 rounded">
+                        <CreditCard size={18} className="text-gray-700" />
+                      </div>
+                      <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                        Visa
+                      </div>
+                      <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                        Mastercard
+                      </div>
+                      <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                        AMEX
+                      </div>
+                      <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                        And more
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <CheckoutForm 
+                  amount={calculateTotalPrice()} 
+                  packageTitle={selectedPackage.title}
+                  onSuccess={handlePaymentSuccess}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        );
+    }
   };
 
   return (
@@ -68,56 +199,7 @@ const Payment = () => {
           Complete Payment
         </h2>
         
-        <Card className="border-2 border-gray-200 mb-8">
-          <CardHeader className="p-6 pb-0">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl font-semibold text-forest">{selectedPackage.title}</CardTitle>
-              <span className="text-xl font-bold text-forest">${calculateTotalPrice()}</span>
-            </div>
-            <CardDescription className="text-gray-600 mt-2">
-              Secure payment powered by Stripe
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="p-6">
-            <div className="mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-700">Package Details</h4>
-                  <p className="text-sm text-gray-600">{selectedPackage.description}</p>
-                  <p className="text-sm text-gray-600 font-semibold">{selectedPackage.date}</p>
-                </div>
-                
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700">Payment Methods</h4>
-                  <div className="flex flex-wrap gap-2">
-                    <div className="bg-gray-100 p-2 rounded">
-                      <CreditCard size={18} className="text-gray-700" />
-                    </div>
-                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
-                      Visa
-                    </div>
-                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
-                      Mastercard
-                    </div>
-                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
-                      AMEX
-                    </div>
-                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
-                      And more
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <CheckoutForm 
-                amount={calculateTotalPrice()} 
-                packageTitle={selectedPackage.title}
-                onSuccess={handlePaymentSuccess}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        {renderContent()}
         
         <div className="mt-8">
           <Button 
