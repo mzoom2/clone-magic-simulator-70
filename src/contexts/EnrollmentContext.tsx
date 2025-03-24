@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 export type PackageInfo = {
@@ -30,7 +29,7 @@ type EnrollmentContextType = {
   setSelectedPackage: (pkg: PackageInfo | null) => void;
   setOccupancyType: (type: OccupancyType) => void;
   setVisitorCount: (count: number) => void;
-  updateContactInfo: (info: Partial<ContactInfo>) => void;
+  updateContactInfo: (info: Partial<ContactInfo>) => void;  // Changed to Partial<ContactInfo>
   resetEnrollment: () => void;
   calculateTotalPrice: () => string;
   updatePackagePrices?: (id: string, singlePrice: string, doublePrice: string) => void;
