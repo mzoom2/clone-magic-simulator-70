@@ -36,21 +36,23 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
   
   const { isAuthenticated } = useAuth();
   const authCheckPerformed = useRef(false);
+  const wasAuthenticated = useRef(false);
   
-  // Close the dialog if user becomes authenticated
+  // Track authentication status changes
   useEffect(() => {
-    if (isAuthenticated && isDialogOpen) {
-      closeAuthDialog();
+    // If user becomes authenticated, mark it
+    if (isAuthenticated && !wasAuthenticated.current) {
+      wasAuthenticated.current = true;
       authCheckPerformed.current = true;
     }
-  }, [isAuthenticated, isDialogOpen, closeAuthDialog]);
+  }, [isAuthenticated]);
   
   // Prevent reopening the dialog immediately after authentication
   useEffect(() => {
     if (isAuthenticated && authCheckPerformed.current) {
       const timeoutId = setTimeout(() => {
         authCheckPerformed.current = false;
-      }, 1000);
+      }, 3000); // Longer timeout to ensure we don't reopen too quickly
       
       return () => clearTimeout(timeoutId);
     }

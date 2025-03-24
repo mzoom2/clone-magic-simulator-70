@@ -32,26 +32,32 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
-  // Add state to track the previous page
-  const [previousPage, setPreviousPage] = useState<string | null>(null);
-  const [dialogClosed, setDialogClosed] = useState(false);
+  // Track when dialog was opened
+  const [dialogOpenTime, setDialogOpenTime] = useState<number | null>(null);
+  const [processingAuth, setProcessingAuth] = useState(false);
+
+  // Reset open time when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setDialogOpenTime(Date.now());
+      setProcessingAuth(false);
+    } else {
+      setDialogOpenTime(null);
+    }
+  }, [isOpen]);
 
   // Close dialog automatically if user becomes authenticated
   useEffect(() => {
-    if (isAuthenticated && isOpen && !dialogClosed) {
+    // Only proceed if dialog is open and we're not already processing
+    if (isAuthenticated && isOpen && !processingAuth) {
+      setProcessingAuth(true);
       handleSuccessfulAuth();
-      setDialogClosed(true);
     }
-  }, [isAuthenticated, isOpen, dialogClosed]);
+  }, [isAuthenticated, isOpen]);
   
-  // Reset internal state when dialog opens/closes
+  // Reset form fields when dialog opens/closes
   useEffect(() => {
-    if (isOpen) {
-      setDialogClosed(false);
-      if (!previousPage) {
-        setPreviousPage(document.referrer || '/');
-      }
-    } else {
+    if (!isOpen) {
       // Reset form fields when dialog closes
       setLoginEmail('');
       setLoginPassword('');
@@ -62,19 +68,29 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
       setIsLoggingIn(false);
       setIsRegistering(false);
     }
-  }, [isOpen, previousPage]);
+  }, [isOpen]);
 
   const handleDialogClose = () => {
-    // Simply call the onClose handler instead of navigating away
-    onClose();
+    // Only close if we're not in the middle of authentication
+    if (!isLoggingIn && !isRegistering) {
+      onClose();
+    }
   };
 
   const handleSuccessfulAuth = () => {
+    // Ensure we don't have multiple calls to onClose
+    if (!processingAuth) {
+      setProcessingAuth(true);
+    }
+    
     onClose();
     
     // Navigate to redirect path if provided, otherwise stay on current page
     if (redirectPath) {
-      window.location.href = redirectPath;
+      // Small delay to ensure dialog is fully closed
+      setTimeout(() => {
+        window.location.href = redirectPath;
+      }, 100);
     }
   };
 
@@ -90,9 +106,12 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           description: "You are now logged in",
         });
         handleSuccessfulAuth();
+      } else {
+        setProcessingAuth(false);
       }
     } catch (error) {
       console.error("Login error:", error);
+      setProcessingAuth(false);
     } finally {
       setIsLoggingIn(false);
     }
@@ -110,14 +129,18 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           description: "Your account has been created and you are now logged in",
         });
         handleSuccessfulAuth();
+      } else {
+        setProcessingAuth(false);
       }
     } catch (error) {
       console.error("Registration error:", error);
+      setProcessingAuth(false);
     } finally {
       setIsRegistering(false);
     }
   };
 
+  // The rest of the component remains unchanged
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
       <DialogContent className="sm:max-w-md">
