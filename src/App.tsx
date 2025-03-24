@@ -27,6 +27,30 @@ import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
+// Check for auth token in URL and save it to localStorage
+const CheckAuthToken = () => {
+  const location = useLocation();
+  const { token, refreshUserData } = useAuth();
+  
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const authToken = query.get('auth_token');
+    
+    if (authToken && !token) {
+      console.log('Found auth token in URL, restoring session');
+      localStorage.setItem('auth_token', authToken);
+      refreshUserData();
+      
+      // Remove the token from the URL to avoid exposing it
+      const newUrl = window.location.pathname + 
+        (location.search ? location.search.replace(/(&|\?)auth_token=[^&]+/, '') : '');
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [location, token, refreshUserData]);
+  
+  return null;
+};
+
 // Protected route component for admin-only pages
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -115,6 +139,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
+            <CheckAuthToken />
             <AppRoutes />
           </BrowserRouter>
         </AuthDialogProvider>

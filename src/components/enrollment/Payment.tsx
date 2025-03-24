@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
@@ -19,7 +20,7 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, token } = useAuth();
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
 
   // Handle return from Stripe Checkout
@@ -27,10 +28,21 @@ const Payment = () => {
     // Check for success or cancel status from Stripe redirect
     const query = new URLSearchParams(location.search);
     const status = query.get('payment_status');
+    const authToken = query.get('auth_token');
     
     console.log('Payment component loaded. URL params:', location.search);
     console.log('Payment status from URL:', status);
     console.log('Authentication status:', isAuthenticated);
+    
+    // If there's an auth token in the URL and we're not authenticated,
+    // we should update the auth state first before proceeding
+    if (authToken && !token) {
+      console.log('Found auth token in URL, restoring session');
+      localStorage.setItem('auth_token', authToken);
+      // After setting the token, reload the page to reinitialize auth context
+      window.location.href = '/dashboard';
+      return;
+    }
     
     if (status === 'success') {
       setPaymentStatus('success');
@@ -39,11 +51,9 @@ const Payment = () => {
         description: "Your booking has been confirmed. Thank you for choosing us!",
       });
       
-      // Reset enrollment and redirect to home after delay
-      setTimeout(() => {
-        resetEnrollment();
-        navigate('/dashboard');
-      }, 3000);
+      // Reset enrollment and redirect to dashboard immediately
+      resetEnrollment();
+      navigate('/dashboard');
     } else if (status === 'canceled') {
       setPaymentStatus('canceled');
       toast({
@@ -59,12 +69,12 @@ const Payment = () => {
         variant: "destructive",
       });
     }
-  }, [location.search, toast, navigate, resetEnrollment, isAuthenticated]);
+  }, [location.search, toast, navigate, resetEnrollment, isAuthenticated, token]);
 
   // Redirect to enrollment start if package is not selected
   useEffect(() => {
     if (!isAuthenticated) {
-      console.log('User not authenticated, redirecting to dashboard');
+      console.log('User not authenticated, redirecting to login');
       navigate('/login');
       return;
     }
