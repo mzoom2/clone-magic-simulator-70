@@ -7,33 +7,24 @@ export const useAuthDialog = () => {
   const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
   const { isAuthenticated } = useAuth();
   const lastClosedTime = useRef(0);
-  const dialogClosed = useRef(false);
   
-  // Close dialog if user becomes authenticated
+  // Close dialog if user becomes authenticated while dialog is open
   useEffect(() => {
     if (isAuthenticated && isDialogOpen) {
       closeAuthDialog();
-      dialogClosed.current = true;
-      
-      // Store authentication status in sessionStorage to prevent popup from reappearing
-      sessionStorage.setItem('auth_dialog_closed', 'true');
     }
   }, [isAuthenticated, isDialogOpen]);
   
-  // Check session storage on mount to prevent reopening after page refresh
+  // Reset session storage flag when authentication state changes
   useEffect(() => {
-    // Only check session storage if user is authenticated
     if (isAuthenticated) {
+      // If user is authenticated, store that in session storage
       sessionStorage.setItem('auth_dialog_closed', 'true');
+    } else {
+      // If user is not authenticated (logged out), remove the flag
+      sessionStorage.removeItem('auth_dialog_closed');
     }
   }, [isAuthenticated]);
-  
-  // Reset the dialogClosed flag when dialog opens
-  useEffect(() => {
-    if (isDialogOpen) {
-      dialogClosed.current = false;
-    }
-  }, [isDialogOpen]);
   
   const openAuthDialog = useCallback((path?: string) => {
     // Prevent reopening if already authenticated
@@ -41,13 +32,14 @@ export const useAuthDialog = () => {
       return;
     }
     
-    // Check if auth dialog should be shown - only prevent if user is authenticated
-    // If the user has logged out, we should show the dialog even if it was closed before
+    // Check if auth dialog should be shown
+    // Only prevent showing if user explicitly closed it in the same session
+    // AND if they're not logged out (so it will show after logout)
     if (sessionStorage.getItem('auth_dialog_closed') === 'true' && isAuthenticated) {
       return;
     }
     
-    // Prevent rapid toggling by checking if dialog was recently closed
+    // Prevent rapid toggling
     const now = Date.now();
     if (now - lastClosedTime.current < 1000) {
       return;
@@ -64,7 +56,8 @@ export const useAuthDialog = () => {
     setRedirectPath(undefined);
     lastClosedTime.current = Date.now();
     
-    // Only set session storage flag if user is authenticated
+    // Only store the closed flag if explicitly closed by the user (not by auth state)
+    // AND only if authenticated (to allow reopening after logout)
     if (isAuthenticated) {
       sessionStorage.setItem('auth_dialog_closed', 'true');
     }

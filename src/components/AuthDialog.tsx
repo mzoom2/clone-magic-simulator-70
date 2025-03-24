@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
@@ -34,35 +33,20 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   const { toast } = useToast();
   
   // Track when dialog was opened
-  const [dialogOpenTime, setDialogOpenTime] = useState<number | null>(null);
   const [processingAuth, setProcessingAuth] = useState(false);
-
-  // Reset open time when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      setDialogOpenTime(Date.now());
-      setProcessingAuth(false);
-    } else {
-      setDialogOpenTime(null);
-    }
-  }, [isOpen]);
 
   // Close dialog automatically if user becomes authenticated
   useEffect(() => {
-    // Only proceed if dialog is open and we're not already processing
     if (isAuthenticated && isOpen && !processingAuth) {
       setProcessingAuth(true);
       handleSuccessfulAuth();
-      
-      // Save to session storage that auth was successful
-      sessionStorage.setItem('auth_dialog_closed', 'true');
     }
   }, [isAuthenticated, isOpen]);
   
   // Reset form fields when dialog opens/closes
   useEffect(() => {
     if (!isOpen) {
-      // Reset form fields when dialog closes
+      // Reset form fields and processing state when dialog closes
       setLoginEmail('');
       setLoginPassword('');
       setRegisterEmail('');
@@ -71,6 +55,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
       setLastName('');
       setIsLoggingIn(false);
       setIsRegistering(false);
+      setProcessingAuth(false);
     }
   }, [isOpen]);
 
@@ -78,23 +63,18 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     // Only close if we're not in the middle of authentication
     if (!isLoggingIn && !isRegistering) {
       onClose();
-      // Save that dialog was closed by user
-      sessionStorage.setItem('auth_dialog_closed', 'true');
     }
   };
 
   const handleSuccessfulAuth = () => {
-    // Ensure we don't have multiple calls to onClose
+    // Only process once
     if (!processingAuth) {
       setProcessingAuth(true);
     }
     
     onClose();
     
-    // Save authentication state to browser
-    sessionStorage.setItem('auth_dialog_closed', 'true');
-    
-    // Navigate to redirect path if provided, otherwise stay on current page
+    // If we have a redirectPath, navigate to it
     if (redirectPath) {
       // Small delay to ensure dialog is fully closed
       setTimeout(() => {
@@ -115,9 +95,6 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           description: "You are now logged in",
         });
         handleSuccessfulAuth();
-        
-        // Save authentication state to browser
-        sessionStorage.setItem('auth_dialog_closed', 'true');
       } else {
         setProcessingAuth(false);
       }
@@ -141,9 +118,6 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
           description: "Your account has been created and you are now logged in",
         });
         handleSuccessfulAuth();
-        
-        // Save authentication state to browser
-        sessionStorage.setItem('auth_dialog_closed', 'true');
       } else {
         setProcessingAuth(false);
       }
