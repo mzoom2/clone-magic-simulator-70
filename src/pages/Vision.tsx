@@ -42,14 +42,19 @@ const Vision = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Hero Section with Video */}
       <section className="relative h-[60vh] bg-forest">
         <div className="absolute inset-0">
-          <img 
-            src="/lovable-uploads/5105021d-b044-4cfc-8833-37ce9098c033.png" 
-            alt="Kàábọ̀ Founder" 
+          <video 
             className="w-full h-full object-cover"
-          />
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
           <div className="absolute inset-0 hero-overlay"></div>
         </div>
         <div className="absolute bottom-16 left-16 md:left-24 text-white z-10">
