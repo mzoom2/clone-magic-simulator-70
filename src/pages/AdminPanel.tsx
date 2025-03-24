@@ -164,10 +164,11 @@ const TransactionManagement = () => {
                           checked={transaction.attended}
                           onCheckedChange={(checked) => handleAttendanceChange(transaction.id, checked)}
                           disabled={transaction.status !== 'completed'}
+                          className="cursor-pointer"
                         />
                         <label 
                           htmlFor={`attended-${transaction.id}`}
-                          className="text-sm"
+                          className="text-sm cursor-pointer"
                         >
                           {transaction.attended ? 'Yes' : 'No'}
                         </label>
