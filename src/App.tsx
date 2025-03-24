@@ -23,7 +23,7 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AuthDialogProvider } from "./contexts/AuthDialogProvider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const queryClient = new QueryClient();
 
@@ -31,22 +31,24 @@ const queryClient = new QueryClient();
 const CheckAuthToken = () => {
   const location = useLocation();
   const { token, refreshUserData } = useAuth();
+  const [tokenProcessed, setTokenProcessed] = useState(false);
   
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const authToken = query.get('auth_token');
     
-    if (authToken && !token) {
+    if (authToken && !token && !tokenProcessed) {
       console.log('Found auth token in URL, restoring session');
       localStorage.setItem('auth_token', authToken);
       refreshUserData();
+      setTokenProcessed(true);
       
       // Remove the token from the URL to avoid exposing it
       const newUrl = window.location.pathname + 
         (location.search ? location.search.replace(/(&|\?)auth_token=[^&]+/, '') : '');
       window.history.replaceState({}, '', newUrl);
     }
-  }, [location, token, refreshUserData]);
+  }, [location, token, refreshUserData, tokenProcessed]);
   
   return null;
 };

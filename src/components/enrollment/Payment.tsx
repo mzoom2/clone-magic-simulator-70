@@ -20,11 +20,16 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated, token, user } = useAuth();
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
 
   // Handle return from Stripe Checkout
   useEffect(() => {
+    if (!isAuthenticated) {
+      console.log('User not authenticated on payment page, will redirect soon');
+      // Don't redirect immediately as auth token may be in URL and being processed
+    }
+    
     // Check for success or cancel status from Stripe redirect
     const query = new URLSearchParams(location.search);
     const status = query.get('payment_status');
@@ -73,15 +78,20 @@ const Payment = () => {
 
   // Redirect to enrollment start if package is not selected
   useEffect(() => {
-    if (!isAuthenticated) {
-      console.log('User not authenticated, redirecting to login');
-      navigate('/login');
-      return;
-    }
-    
-    if (!selectedPackage || !occupancyType) {
-      navigate('/enroll');
-    }
+    // Add delay to allow auth token processing
+    const redirectTimer = setTimeout(() => {
+      if (!isAuthenticated) {
+        console.log('User not authenticated after delay, redirecting to login');
+        navigate('/login');
+        return;
+      }
+      
+      if (!selectedPackage || !occupancyType) {
+        navigate('/enroll');
+      }
+    }, 500); // Short delay to allow auth processing
+
+    return () => clearTimeout(redirectTimer);
   }, [selectedPackage, occupancyType, navigate, isAuthenticated]);
 
   const handleBack = () => {
@@ -92,6 +102,14 @@ const Payment = () => {
     // This will be triggered when we handle redirect back from Stripe
     console.log('Payment initiated');
   };
+
+  // Prepare user info if available
+  const userInfo = user ? {
+    userId: user.id,
+    email: user.email,
+    firstName: user.first_name,
+    lastName: user.last_name
+  } : undefined;
 
   // Render different content based on payment status
   const renderContent = () => {
@@ -105,8 +123,8 @@ const Payment = () => {
               </div>
               <CardTitle className="text-xl font-semibold text-center">Payment Successful!</CardTitle>
               <CardDescription className="text-center mt-2">
-                Your booking for {selectedPackage.title} has been confirmed.
-                <br />You will be redirected to the home page shortly.
+                Your booking for {selectedPackage?.title} has been confirmed.
+                <br />You will be redirected to the dashboard shortly.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -127,8 +145,9 @@ const Payment = () => {
             <CardContent className="p-6">
               <CheckoutForm 
                 amount={calculateTotalPrice()} 
-                packageTitle={selectedPackage.title}
+                packageTitle={selectedPackage?.title || ''}
                 onSuccess={handlePaymentSuccess}
+                userInfo={userInfo}
               />
             </CardContent>
           </Card>
@@ -149,8 +168,9 @@ const Payment = () => {
             <CardContent className="p-6">
               <CheckoutForm 
                 amount={calculateTotalPrice()} 
-                packageTitle={selectedPackage.title}
+                packageTitle={selectedPackage?.title || ''}
                 onSuccess={handlePaymentSuccess}
+                userInfo={userInfo}
               />
             </CardContent>
           </Card>
@@ -161,7 +181,7 @@ const Payment = () => {
           <Card className="border-2 border-gray-200 mb-8">
             <CardHeader className="p-6 pb-0">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-xl font-semibold text-forest">{selectedPackage.title}</CardTitle>
+                <CardTitle className="text-xl font-semibold text-forest">{selectedPackage?.title}</CardTitle>
                 <span className="text-xl font-bold text-forest">${calculateTotalPrice()}</span>
               </div>
               <CardDescription className="text-gray-600 mt-2">
@@ -174,8 +194,8 @@ const Payment = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-gray-700">Package Details</h4>
-                    <p className="text-sm text-gray-600">{selectedPackage.description}</p>
-                    <p className="text-sm text-gray-600 font-semibold">{selectedPackage.date}</p>
+                    <p className="text-sm text-gray-600">{selectedPackage?.description}</p>
+                    <p className="text-sm text-gray-600 font-semibold">{selectedPackage?.date}</p>
                   </div>
                   
                   <div className="space-y-3">
@@ -202,8 +222,9 @@ const Payment = () => {
                 
                 <CheckoutForm 
                   amount={calculateTotalPrice()} 
-                  packageTitle={selectedPackage.title}
+                  packageTitle={selectedPackage?.title || ''}
                   onSuccess={handlePaymentSuccess}
+                  userInfo={userInfo}
                 />
               </div>
             </CardContent>
@@ -211,6 +232,10 @@ const Payment = () => {
         );
     }
   };
+
+  if (!selectedPackage && paymentStatus === 'idle') {
+    return <div className="text-center p-8">Loading payment details...</div>;
+  }
 
   return (
     <StripeProvider>

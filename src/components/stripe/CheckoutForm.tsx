@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useStripe } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, CreditCard, CheckCircle2 } from 'lucide-react';
+import { Loader2, CreditCard, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,6 +33,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
   const [email, setEmail] = useState(userInfo?.email || user?.email || '');
   const [firstName, setFirstName] = useState(userInfo?.firstName || user?.first_name || '');
   const [lastName, setLastName] = useState(userInfo?.lastName || user?.last_name || '');
+  const [isStripeReady, setIsStripeReady] = useState(false);
+  
+  // Check if Stripe is loaded
+  useEffect(() => {
+    if (stripe) {
+      setIsStripeReady(true);
+    }
+  }, [stripe]);
 
   // Convert price string like "1,900" to number in cents (190000)
   const getAmountInCents = (): number => {
@@ -92,7 +101,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
       });
       
       if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+        throw new Error(errorData.error || 'Failed to create checkout session');
       }
       
       const { checkout_url, session_id } = await response.json();
@@ -104,7 +114,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
       window.location.href = checkout_url;
     } catch (err) {
       console.error('Error initiating checkout:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.');
       toast({
         title: "Checkout Error",
         description: "There was a problem initiating the checkout process. Please try again.",
@@ -114,6 +124,18 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
       setIsLoading(false);
     }
   };
+
+  // Determine what's preventing the form submission
+  const getButtonDisabledReason = () => {
+    if (!isStripeReady) return "Waiting for payment system to load...";
+    if (!email) return "Email is required";
+    if (!firstName) return "First name is required";
+    if (!lastName) return "Last name is required";
+    return null;
+  };
+
+  const buttonDisabledReason = getButtonDisabledReason();
+  const isButtonDisabled = !isStripeReady || isLoading || !email || !firstName || !lastName;
 
   return (
     <Card className="border-2 border-gray-100 shadow-sm">
@@ -139,7 +161,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
             
             <div className="space-y-3 pt-4">
               <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
                 <Input 
                   id="email" 
                   type="email" 
@@ -147,29 +169,32 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={!!userInfo?.email}
+                  placeholder="Your email address"
                 />
               </div>
               
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
                   <Input 
                     id="firstName" 
                     value={firstName} 
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                     disabled={!!userInfo?.firstName}
+                    placeholder="Your first name"
                   />
                 </div>
                 
                 <div className="space-y-1">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">Last Name <span className="text-red-500">*</span></Label>
                   <Input 
                     id="lastName" 
                     value={lastName} 
                     onChange={(e) => setLastName(e.target.value)}
                     required
                     disabled={!!userInfo?.lastName}
+                    placeholder="Your last name"
                   />
                 </div>
               </div>
@@ -182,10 +207,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
           </div>
         </CardContent>
         
-        <CardFooter className="pt-2">
+        <CardFooter className="pt-2 flex flex-col">
           <Button 
             type="submit"
-            disabled={!stripe || isLoading || !email || !firstName || !lastName}
+            disabled={isButtonDisabled}
             className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black rounded-full px-8 py-6 h-auto text-base font-medium w-full"
           >
             {isLoading ? (
@@ -201,8 +226,16 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
             )}
           </Button>
           
+          {isButtonDisabled && buttonDisabledReason && !isLoading && (
+            <div className="flex items-center justify-center mt-3 text-amber-600 text-sm">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              {buttonDisabledReason}
+            </div>
+          )}
+          
           {error && (
-            <div className="text-destructive text-sm mt-4 w-full text-center">
+            <div className="text-destructive text-sm mt-3 w-full text-center flex items-center justify-center">
+              <AlertCircle className="h-4 w-4 mr-1" />
               {error}
             </div>
           )}
