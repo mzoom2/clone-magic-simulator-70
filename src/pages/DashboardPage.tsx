@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -21,7 +20,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle, XCircle, Clock, LogOut, Calendar } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Clock, LogOut, Calendar, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Transaction {
@@ -106,7 +105,11 @@ const DashboardPage = () => {
 
   const getAttendanceStatus = (transaction: Transaction) => {
     if (transaction.status !== 'completed') {
-      return null; // Only show attendance for completed transactions
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          {transaction.status === 'canceled' ? 'Canceled' : 'Processing'}
+        </span>
+      );
     }
     
     if (transaction.attended) {
@@ -119,9 +122,20 @@ const DashboardPage = () => {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
           <Calendar size={12} />
-          Upcoming
+          Paid, Awaiting Event
         </span>
       );
+    }
+  };
+
+  // Get a more descriptive status text for the transaction
+  const getStatusText = (transaction: Transaction) => {
+    if (transaction.status === 'completed') {
+      return transaction.attended ? 'Completed' : 'Paid, Awaiting Event';
+    } else if (transaction.status === 'canceled') {
+      return 'Canceled';
+    } else {
+      return 'Processing';
     }
   };
 
@@ -167,9 +181,15 @@ const DashboardPage = () => {
                     <span className="text-gray-500">Email:</span>
                     <span className="font-medium break-all">{user?.email}</span>
                   </div>
+                  {user?.role === 'admin' && (
+                    <div className="flex justify-between flex-wrap gap-1 mt-2">
+                      <span className="text-gray-500">Role:</span>
+                      <span className="font-medium text-forest">Administrator</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col space-y-2">
                 <Button 
                   className="w-full"
                   variant="outline"
@@ -177,6 +197,16 @@ const DashboardPage = () => {
                 >
                   <Link to="/enroll">Book New Experience</Link>
                 </Button>
+                
+                {user?.role === 'admin' && (
+                  <Button 
+                    className="w-full"
+                    variant="default"
+                    asChild
+                  >
+                    <Link to="/admin">Admin Panel</Link>
+                  </Button>
+                )}
               </CardFooter>
             </Card>
             
@@ -219,7 +249,7 @@ const DashboardPage = () => {
                             <TableCell className="hidden sm:table-cell">{formatDate(transaction.created_at)}</TableCell>
                             <TableCell className="flex items-center">
                               {getStatusIcon(transaction.status)}
-                              <span className="ml-2 capitalize">{transaction.status}</span>
+                              <span className="ml-2">{getStatusText(transaction)}</span>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -265,7 +295,7 @@ const DashboardPage = () => {
                           <TableCell className="hidden sm:table-cell">{formatDate(transaction.created_at)}</TableCell>
                           <TableCell className="flex items-center">
                             {getStatusIcon(transaction.status)}
-                            <span className="ml-2 capitalize">{transaction.status}</span>
+                            <span className="ml-2">{getStatusText(transaction)}</span>
                           </TableCell>
                           <TableCell className="hidden sm:table-cell">
                             {getAttendanceStatus(transaction)}
