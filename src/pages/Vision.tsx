@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -54,10 +55,6 @@ const Vision = () => {
             Your browser does not support the video tag.
           </video>
           <div className="absolute inset-0 hero-overlay"></div>
-        </div>
-        <div className="absolute bottom-16 left-16 md:left-24 text-white z-10">
-          <h2 className="text-3xl md:text-4xl font-light text-white animate-fade-in">small scale projects,</h2>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mt-2 animate-fade-in opacity-0" style={{ animationDelay: '300ms' }}>BIG IMPACT</h1>
         </div>
       </section>
 
