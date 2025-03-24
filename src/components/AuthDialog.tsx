@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
@@ -51,17 +50,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   }, [isOpen, previousPage]);
 
   const handleDialogClose = () => {
-    // Navigate back to previous page if on enrollment
-    if (window.location.pathname.includes('/enroll')) {
-      if (previousPage && previousPage !== window.location.href) {
-        window.location.href = previousPage;
-      } else {
-        // Fallback to homepage if no valid previous page
-        window.location.href = '/';
-      }
-    }
-    
-    // Call the original onClose handler
+    // Simply call the onClose handler instead of navigating away
     onClose();
   };
 
