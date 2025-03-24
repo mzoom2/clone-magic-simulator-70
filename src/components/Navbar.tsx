@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
-import { Menu, X, ChevronDown, LogOut, User } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, User, Home } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Sheet,
@@ -97,7 +96,7 @@ const Navbar = () => {
     { name: 'Behind The Scenes', path: '/catalogue/behind-the-scenes' },
     { name: 'Detty December', path: '/catalogue/detty-december' },
   ];
-
+  
   // Determine if the current page has a hero section with a transparent navbar
   const hasHeroSection = !location.pathname.includes('enroll') && !location.pathname.includes('dashboard');
   
@@ -119,7 +118,7 @@ const Navbar = () => {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6 py-4",
         navbarBackground
       )}
     >
@@ -136,7 +135,7 @@ const Navbar = () => {
         </Link>
         
         {/* Desktop navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-5 lg:space-x-8">
           {/* Regular nav items */}
           {navItems.map((item) => (
             <Link 
@@ -289,26 +288,31 @@ const Navbar = () => {
         {/* Desktop action buttons */}
         <div className={cn("flex items-center gap-4", isMobile ? "hidden" : "flex")}>
           {isAuthenticated ? (
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                className="flex items-center gap-2 hover:text-forest"
-                asChild
-              >
-                <Link to="/dashboard">
-                  <User size={18} />
-                  Dashboard
-                </Link>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                onClick={handleLogout}
-              >
-                <LogOut size={18} />
-                Logout
-              </Button>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center gap-2 hover:text-forest"
+                  >
+                    <User size={18} />
+                    <span className="hidden xl:inline">Account</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                      <Home size={16} />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-red-600 cursor-pointer">
+                    <LogOut size={16} />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <Link 
