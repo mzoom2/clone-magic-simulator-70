@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -103,6 +104,34 @@ const TransactionManagement = () => {
     }
   };
 
+  const markAsAttended = async (transactionId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/transactions/${transactionId}/attended`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ attended: true })
+      });
+      
+      if (response.ok) {
+        // Update local state
+        setTransactions(transactions.map(t => 
+          t.id === transactionId ? { ...t, attended: true } : t
+        ));
+        toast.success('Transaction marked as attended');
+      } else {
+        toast.error('Failed to mark as attended');
+      }
+    } catch (error) {
+      console.error('Failed to update attendance:', error);
+      toast.error('Could not connect to the server');
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -132,6 +161,7 @@ const TransactionManagement = () => {
                   <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Attended</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -184,6 +214,27 @@ const TransactionManagement = () => {
                           <span className="text-sm text-gray-500">N/A</span>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {transaction.status === 'completed' && !transaction.attended ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex items-center" 
+                          onClick={() => markAsAttended(transaction.id)}
+                        >
+                          <Check className="mr-1 h-4 w-4" /> Mark Attended
+                        </Button>
+                      ) : transaction.status === 'pending' ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex items-center" 
+                          onClick={() => markAsAttended(transaction.id)}
+                        >
+                          <Check className="mr-1 h-4 w-4" /> Mark Attended
+                        </Button>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 ))}
