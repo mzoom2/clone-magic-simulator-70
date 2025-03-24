@@ -2,9 +2,11 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { AlertCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NotFound = () => {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     console.error(
@@ -17,15 +19,29 @@ const NotFound = () => {
                              location.search.includes('payment_status') ||
                              location.search.includes('session_id');
     
+    // Check if this is an auth-related error
+    const isAuthError = location.pathname.includes('login') || 
+                        location.pathname.includes('register') ||
+                        location.pathname.includes('dashboard') ||
+                        location.pathname.includes('admin');
+    
     if (isStripeRedirect) {
       console.error("Possible Stripe redirect failure. Search params:", location.search);
     }
-  }, [location.pathname, location.search]);
+    
+    if (isAuthError) {
+      console.error("Possible authentication error. User authenticated:", isAuthenticated);
+    }
+  }, [location.pathname, location.search, isAuthenticated]);
 
   // Check if this might be a Stripe redirect
   const isStripeRedirect = location.pathname.includes('payment') || 
                            location.search.includes('payment_status') ||
                            location.search.includes('session_id');
+  
+  // Check if this might be an auth error
+  const isAuthError = location.pathname.includes('dashboard') &&
+                      !isAuthenticated;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -58,6 +74,23 @@ const NotFound = () => {
                   Return to Home
                 </Link>
               </div>
+            </div>
+          </>
+        ) : isAuthError ? (
+          <>
+            <p className="text-xl text-gray-600 mb-6">
+              You need to be logged in to access this page.
+            </p>
+            <Link 
+              to="/login" 
+              className="bg-forest text-white px-6 py-3 rounded-full inline-block hover:bg-forest/90 transition-colors"
+            >
+              Sign In
+            </Link>
+            <div>
+              <Link to="/" className="text-forest hover:text-forest/80 underline mt-4 inline-block">
+                Return to Home
+              </Link>
             </div>
           </>
         ) : (
