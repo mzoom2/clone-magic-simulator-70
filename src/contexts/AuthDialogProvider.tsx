@@ -35,22 +35,13 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
   } = useAuthDialog();
   
   const { isAuthenticated } = useAuth();
-  const prevAuthState = useRef(isAuthenticated);
+  const previousAuthState = useRef(isAuthenticated);
   
-  // Track authentication status changes
+  // Handle authentication state changes
   useEffect(() => {
-    // If authentication state changed (login or logout)
-    if (isAuthenticated !== prevAuthState.current) {
-      prevAuthState.current = isAuthenticated;
-      
-      // Update session storage based on current auth state
-      if (isAuthenticated) {
-        // When user logs in, store authentication status
-        sessionStorage.setItem('auth_dialog_closed', 'true');
-      } else {
-        // When user logs out, remove the auth_dialog_closed flag
-        sessionStorage.removeItem('auth_dialog_closed');
-      }
+    if (previousAuthState.current !== isAuthenticated) {
+      // Update the previous auth state
+      previousAuthState.current = isAuthenticated;
     }
   }, [isAuthenticated]);
   

@@ -98,8 +98,7 @@ const EnrollmentManager = () => {
   const { checkAuthAndProceed } = useAuthDialogContext();
   
   useEffect(() => {
-    // Only check authentication if not already authenticated
-    // This prevents the dialog from appearing after successful login
+    // Show auth dialog only if user is not authenticated
     if (!isAuthenticated) {
       checkAuthAndProceed('/enroll', () => {
         // This callback won't execute since the user isn't authenticated yet
@@ -107,7 +106,7 @@ const EnrollmentManager = () => {
       return; // Exit early if not authenticated
     }
     
-    // Parse package ID from URL query parameters
+    // Handle package selection from URL
     const searchParams = new URLSearchParams(location.search);
     const packageId = searchParams.get('package');
     
@@ -116,9 +115,7 @@ const EnrollmentManager = () => {
       if (selectedPkg) {
         // Pre-select the package and navigate to visitors step
         setSelectedPackage(selectedPkg);
-        // By default, set to double occupancy (user can change on next step if needed)
         setOccupancyType('double');
-        // Redirect to visitors selection step using navigate instead of window.location
         navigate('/enroll/visitors');
       }
     }
@@ -139,7 +136,7 @@ const EnrollmentManager = () => {
     }
   };
 
-  // If not authenticated, render nothing (auth dialog will be shown)
+  // Show nothing while waiting for authentication
   if (!isAuthenticated) {
     return null;
   }

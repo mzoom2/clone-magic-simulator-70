@@ -32,21 +32,22 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
-  // Track when dialog was opened
-  const [processingAuth, setProcessingAuth] = useState(false);
-
   // Close dialog automatically if user becomes authenticated
   useEffect(() => {
-    if (isAuthenticated && isOpen && !processingAuth) {
-      setProcessingAuth(true);
-      handleSuccessfulAuth();
+    if (isAuthenticated && isOpen) {
+      // Small delay to ensure stable state before closing
+      const timer = setTimeout(() => {
+        handleSuccessfulAuth();
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, isOpen]);
   
   // Reset form fields when dialog opens/closes
   useEffect(() => {
     if (!isOpen) {
-      // Reset form fields and processing state when dialog closes
+      // Reset form fields when dialog closes
       setLoginEmail('');
       setLoginPassword('');
       setRegisterEmail('');
@@ -55,7 +56,6 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
       setLastName('');
       setIsLoggingIn(false);
       setIsRegistering(false);
-      setProcessingAuth(false);
     }
   }, [isOpen]);
 
@@ -67,11 +67,6 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   };
 
   const handleSuccessfulAuth = () => {
-    // Only process once
-    if (!processingAuth) {
-      setProcessingAuth(true);
-    }
-    
     onClose();
     
     // If we have a redirectPath, navigate to it
@@ -79,7 +74,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
       // Small delay to ensure dialog is fully closed
       setTimeout(() => {
         window.location.href = redirectPath;
-      }, 100);
+      }, 150);
     }
   };
 
@@ -89,19 +84,13 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     
     try {
       const success = await login(loginEmail, loginPassword);
-      if (success) {
-        toast({
-          title: "Login successful",
-          description: "You are now logged in",
-        });
-        handleSuccessfulAuth();
-      } else {
-        setProcessingAuth(false);
+      if (!success) {
+        // Reset loading state but keep dialog open if login fails
+        setIsLoggingIn(false);
       }
+      // If success, the useEffect will handle dialog closing
     } catch (error) {
       console.error("Login error:", error);
-      setProcessingAuth(false);
-    } finally {
       setIsLoggingIn(false);
     }
   };
@@ -112,19 +101,13 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
     
     try {
       const success = await register(registerEmail, registerPassword, firstName, lastName);
-      if (success) {
-        toast({
-          title: "Registration successful",
-          description: "Your account has been created and you are now logged in",
-        });
-        handleSuccessfulAuth();
-      } else {
-        setProcessingAuth(false);
+      if (!success) {
+        // Reset loading state but keep dialog open if registration fails
+        setIsRegistering(false);
       }
+      // If success, the useEffect will handle dialog closing
     } catch (error) {
       console.error("Registration error:", error);
-      setProcessingAuth(false);
-    } finally {
       setIsRegistering(false);
     }
   };
