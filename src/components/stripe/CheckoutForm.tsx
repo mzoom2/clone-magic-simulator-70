@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useStripe } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FormEvent } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CheckoutFormProps {
   amount: string;
@@ -26,9 +26,12 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState(userInfo?.email || '');
-  const [firstName, setFirstName] = useState(userInfo?.firstName || '');
-  const [lastName, setLastName] = useState(userInfo?.lastName || '');
+  const { user } = useAuth();
+  
+  // Use authenticated user info if available
+  const [email, setEmail] = useState(userInfo?.email || user?.email || '');
+  const [firstName, setFirstName] = useState(userInfo?.firstName || user?.first_name || '');
+  const [lastName, setLastName] = useState(userInfo?.lastName || user?.last_name || '');
 
   // Convert price string like "1,900" to number in cents (190000)
   const getAmountInCents = (): number => {
@@ -63,14 +66,18 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
     try {
       // Get the current origin for the success and cancel URLs
       const origin = window.location.origin;
-      const successUrl = `${origin}/enroll/payment?payment_status=success&session_id={CHECKOUT_SESSION_ID}`;
-      const cancelUrl = `${origin}/enroll/payment?payment_status=canceled`;
+      
+      // Include auth token in the URL to preserve authentication state
+      const authToken = localStorage.getItem('auth_token');
+      const successUrl = `${origin}/enroll/payment?payment_status=success&session_id={CHECKOUT_SESSION_ID}&auth_token=${authToken || ''}`;
+      const cancelUrl = `${origin}/enroll/payment?payment_status=canceled&auth_token=${authToken || ''}`;
       
       // Make request to Python backend to create checkout session
       const response = await fetch('http://localhost:5000/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken || ''}`
         },
         body: JSON.stringify({
           package_title: packageTitle,
@@ -80,7 +87,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
           email: email,
           first_name: firstName,
           last_name: lastName,
-          user_id: userInfo?.userId
+          user_id: userInfo?.userId || user?.id
         }),
       });
       

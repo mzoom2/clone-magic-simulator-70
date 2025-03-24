@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import CheckoutForm from '../stripe/CheckoutForm';
 import StripeProvider from '../stripe/StripeProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Payment = () => {
   const { 
@@ -19,6 +19,7 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
 
   // Handle return from Stripe Checkout
@@ -29,6 +30,7 @@ const Payment = () => {
     
     console.log('Payment component loaded. URL params:', location.search);
     console.log('Payment status from URL:', status);
+    console.log('Authentication status:', isAuthenticated);
     
     if (status === 'success') {
       setPaymentStatus('success');
@@ -40,7 +42,7 @@ const Payment = () => {
       // Reset enrollment and redirect to home after delay
       setTimeout(() => {
         resetEnrollment();
-        navigate('/');
+        navigate('/dashboard');
       }, 3000);
     } else if (status === 'canceled') {
       setPaymentStatus('canceled');
@@ -57,12 +59,20 @@ const Payment = () => {
         variant: "destructive",
       });
     }
-  }, [location.search, toast, navigate, resetEnrollment]);
+  }, [location.search, toast, navigate, resetEnrollment, isAuthenticated]);
 
-  if (!selectedPackage || !occupancyType) {
-    navigate('/enroll');
-    return null;
-  }
+  // Redirect to enrollment start if package is not selected
+  useEffect(() => {
+    if (!isAuthenticated) {
+      console.log('User not authenticated, redirecting to dashboard');
+      navigate('/login');
+      return;
+    }
+    
+    if (!selectedPackage || !occupancyType) {
+      navigate('/enroll');
+    }
+  }, [selectedPackage, occupancyType, navigate, isAuthenticated]);
 
   const handleBack = () => {
     navigate('/enroll/summary');

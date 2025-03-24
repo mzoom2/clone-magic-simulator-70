@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import KaaboExperience from "./pages/KaaboExperience";
@@ -23,19 +23,26 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AuthDialogProvider } from "./contexts/AuthDialogProvider";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
 // Protected route component for admin-only pages
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location.pathname } });
+    } else if (!isAdmin) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, isAdmin, navigate, location]);
   
-  if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
+  if (!isAuthenticated || !isAdmin) {
+    return null;
   }
   
   return <>{children}</>;
@@ -44,9 +51,17 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 // Protected route component for authenticated pages
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location.pathname } });
+    }
+  }, [isAuthenticated, navigate, location]);
   
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return null;
   }
   
   return <>{children}</>;

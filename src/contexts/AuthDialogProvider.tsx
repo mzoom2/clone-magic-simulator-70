@@ -8,6 +8,7 @@ interface AuthDialogContextType {
   openAuthDialog: (redirectPath?: string) => void;
   closeAuthDialog: () => void;
   checkAuthAndProceed: (path: string, onAuthenticated: () => void) => void;
+  isDialogOpen: boolean;
 }
 
 const AuthDialogContext = createContext<AuthDialogContextType | undefined>(undefined);
@@ -47,7 +48,8 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
       value={{
         openAuthDialog,
         closeAuthDialog,
-        checkAuthAndProceed
+        checkAuthAndProceed,
+        isDialogOpen
       }}
     >
       {children}
