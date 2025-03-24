@@ -39,8 +39,11 @@ const LagosArtventure = () => {
           <p className="text-sm md:text-base lg:text-lg mb-6 md:mb-10">
             Hotel, transport, activities, and a week full of activities— it's all covered. You get your flight, we get everything else.
           </p>
-          <Button className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black font-medium px-6 md:px-8 py-4 md:py-6 h-auto text-sm md:text-base rounded-full w-full sm:w-auto">
-            ENQUIRE NOW - BOOK A CALL
+          <Button 
+            className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black font-medium px-6 md:px-8 py-4 md:py-6 h-auto text-sm md:text-base rounded-full w-full sm:w-auto"
+            onClick={() => window.location.href = '/enroll'}
+          >
+            BOOK NOW
           </Button>
         </div>
       </section>
