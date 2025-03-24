@@ -99,9 +99,12 @@ const EnrollmentManager = () => {
   const { checkAuthAndProceed } = useAuthDialogContext();
   
   useEffect(() => {
-    // Check if user is authenticated, but only show the dialog if not authenticated
-    // This prevents showing the dialog after a user has just registered or logged in
+    // Force the auth check on each mount of the enrollment page
+    // This ensures the dialog appears after logout
     if (!isAuthenticated) {
+      // Clear any existing auth_dialog_closed flag to ensure dialog shows
+      sessionStorage.removeItem('auth_dialog_closed');
+      
       checkAuthAndProceed('/enroll', () => {
         // This callback won't execute since the user isn't authenticated yet
       });
