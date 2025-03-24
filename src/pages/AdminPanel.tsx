@@ -120,7 +120,7 @@ const TransactionManagement = () => {
       if (response.ok) {
         // Update local state
         setTransactions(transactions.map(t => 
-          t.id === transactionId ? { ...t, attended: true } : t
+          t.id === transactionId ? { ...t, attended: true, status: 'completed' } : t
         ));
         toast.success('Transaction marked as attended');
       } else {
@@ -128,6 +128,39 @@ const TransactionManagement = () => {
       }
     } catch (error) {
       console.error('Failed to update attendance:', error);
+      toast.error('Could not connect to the server');
+    }
+  };
+
+  const updateTransactionStatus = async (transactionId) => {
+    if (!token) return;
+    
+    try {
+      // First, mark as completed
+      const statusResponse = await fetch(`http://localhost:5000/transactions/${transactionId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'completed' })
+      });
+      
+      if (statusResponse.ok) {
+        // If status update is successful, mark as attended
+        await markAsAttended(transactionId);
+        
+        // Update local state immediately for better UX
+        setTransactions(transactions.map(t => 
+          t.id === transactionId ? { ...t, status: 'completed', attended: true } : t
+        ));
+        
+        toast.success('Transaction status updated and marked as attended');
+      } else {
+        toast.error('Failed to update transaction status');
+      }
+    } catch (error) {
+      console.error('Failed to update transaction:', error);
       toast.error('Could not connect to the server');
     }
   };
@@ -229,10 +262,10 @@ const TransactionManagement = () => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex items-center" 
-                          onClick={() => markAsAttended(transaction.id)}
+                          className="flex items-center text-yellow-700 bg-yellow-50 border-yellow-200 hover:bg-yellow-100" 
+                          onClick={() => updateTransactionStatus(transaction.id)}
                         >
-                          <Check className="mr-1 h-4 w-4" /> Mark Attended
+                          <Check className="mr-1 h-4 w-4" /> Mark Completed & Attended
                         </Button>
                       ) : null}
                     </TableCell>
