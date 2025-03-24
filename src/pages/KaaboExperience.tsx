@@ -1,14 +1,23 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ChevronRight, Check, Plus, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
 
 const KaaboExperience = () => {
+  const navigate = useNavigate();
+  const { checkAuthAndProceed } = useAuthDialogContext();
+
+  const handleBookNow = () => {
+    checkAuthAndProceed('/enroll', () => {
+      navigate('/enroll');
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -40,7 +49,7 @@ const KaaboExperience = () => {
           <Button 
             variant="outline" 
             className="bg-amber-500 hover:bg-amber-600 text-white border-amber-500 rounded-full"
-            onClick={() => window.location.href = '/enroll'}
+            onClick={handleBookNow}
           >
             BOOK NOW
           </Button>
@@ -88,7 +97,7 @@ const KaaboExperience = () => {
                   
                   <Button 
                     className="bg-forest hover:bg-forest/90 text-white"
-                    onClick={() => window.location.href = '/enroll'}
+                    onClick={handleBookNow}
                   >
                     BOOK NOW
                   </Button>
@@ -137,7 +146,7 @@ const KaaboExperience = () => {
                   
                   <Button 
                     className="bg-forest hover:bg-forest/90 text-white"
-                    onClick={() => window.location.href = '/enroll'}
+                    onClick={handleBookNow}
                   >
                     BOOK NOW
                   </Button>
@@ -200,7 +209,7 @@ const KaaboExperience = () => {
                 <Button 
                   variant="outline" 
                   className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
-                  onClick={() => window.location.href = '/enroll'}
+                  onClick={handleBookNow}
                 >
                   BOOK NOW
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -222,7 +231,7 @@ const KaaboExperience = () => {
                 <Button 
                   variant="outline" 
                   className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
-                  onClick={() => window.location.href = '/enroll'}
+                  onClick={handleBookNow}
                 >
                   BOOK NOW
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -244,7 +253,7 @@ const KaaboExperience = () => {
                 <Button 
                   variant="outline" 
                   className="bg-amber-500 border-amber-500 text-white hover:bg-amber-600 hover:text-white hover:border-amber-600 group transition-all duration-300 px-6 rounded-full"
-                  onClick={() => window.location.href = '/enroll'}
+                  onClick={handleBookNow}
                 >
                   BOOK NOW
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

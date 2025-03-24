@@ -22,6 +22,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthDialogProvider } from "./contexts/AuthDialogProvider";
 
 const queryClient = new QueryClient();
 
@@ -94,12 +95,14 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <AppRoutes />
-        </BrowserRouter>
+        <AuthDialogProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthDialogProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

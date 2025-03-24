@@ -1,62 +1,74 @@
 
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
+import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
 
 interface PricingCardProps {
   title: string;
   occupancy: string;
   price: string;
+  packageId: string;
   features: string[];
-  packageId?: string; // ID to identify which package this card is for
+  onBookNow?: () => void;
 }
 
-const PricingCard = ({ title, occupancy, price, features, packageId }: PricingCardProps) => {
-  // Determine if this is for single or double occupancy
-  const isDouble = occupancy.toLowerCase().includes('double');
+const PricingCard = ({ 
+  title, 
+  occupancy, 
+  price, 
+  packageId, 
+  features,
+  onBookNow 
+}: PricingCardProps) => {
+  const { checkAuthAndProceed } = useAuthDialogContext();
+  
+  const handleBookNow = () => {
+    if (onBookNow) {
+      onBookNow();
+    } else {
+      checkAuthAndProceed(`/enroll?package=${packageId}`, () => {
+        window.location.href = `/enroll?package=${packageId}`;
+      });
+    }
+  };
   
   return (
-    <Card className="overflow-hidden rounded-none border-none w-full">
-      <div className="bg-[#FEF7CD] py-4 md:py-6 text-center">
-        <h3 className="text-xl md:text-2xl lg:text-3xl font-medium text-forest">
-          {title}
-        </h3>
-        <p className="text-forest">{occupancy}</p>
+    <div className="bg-black border border-gray-800 rounded-lg overflow-hidden text-white transition-all hover:border-white/30 flex flex-col">
+      <div className="bg-white/10 p-6 text-center">
+        <h3 className="text-lg md:text-xl font-medium text-amber-400 mb-1">{title}</h3>
+        <p className="opacity-80 text-sm mb-4">{occupancy}</p>
+        <div className="text-center">
+          <span className="text-3xl md:text-4xl font-serif">
+            <sup className="text-lg relative -top-3">$</sup>
+            {price}
+          </span>
+          <span className="text-sm opacity-70 ml-1">USD</span>
+        </div>
       </div>
-      <CardContent className="p-0">
-        <div className="pt-6 md:pt-8 pb-3 md:pb-4 text-center">
-          <div className="inline-flex items-baseline">
-            <span className="text-forest text-xl align-top">$</span>
-            <span className="text-forest text-4xl md:text-6xl font-medium">
-              {price}
-            </span>
-            <span className="text-forest text-lg">pp</span>
-          </div>
-        </div>
-        <div className="space-y-3 md:space-y-4 px-4 md:px-6 pb-6">
+      
+      <div className="flex-grow p-6">
+        <ul className="space-y-3 mb-8">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-center py-2 border-b border-gray-200">
-              <Check size={18} className="text-forest mr-2 md:mr-3 flex-shrink-0" />
-              <span className="text-sm md:text-base">{feature}</span>
-            </div>
+            <li key={index} className="flex items-start gap-2">
+              <div className="flex-shrink-0 mt-1 text-amber-400">
+                <Check size={16} />
+              </div>
+              <span className="text-sm">{feature}</span>
+            </li>
           ))}
-          <div className="pt-4 md:pt-6 pb-2 text-center">
-            <Button asChild className="bg-[#6d2a12] hover:bg-[#6d2a12]/90 text-white rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-sm md:text-base font-medium w-full md:w-auto">
-              <Link to={packageId ? `/enroll?package=${packageId}` : "/enroll"}>ENROLL NOW</Link>
-            </Button>
-          </div>
-          <div className="text-center text-xs md:text-sm text-gray-600 mt-3 md:mt-4 px-2 md:px-4">
-            <p>
-              All prices exclude: International Flights,<br />
-              Personal Shopping, Meals outside<br />
-              designated activities, Travel Insurance
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </ul>
+        
+        <Button 
+          className="w-full bg-amber-500 hover:bg-amber-600 text-black font-medium group py-2 h-auto"
+          onClick={handleBookNow}
+        >
+          BOOK NOW
+          <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </Button>
+      </div>
+    </div>
   );
 };
 

@@ -11,6 +11,8 @@ import Payment from '@/components/enrollment/Payment';
 import { EnrollmentProvider, useEnrollment, packages } from '@/contexts/EnrollmentContext';
 import { Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
 
 // Step indicator component
 const StepIndicator = ({ currentStep }: { currentStep: string }) => {
@@ -93,8 +95,18 @@ const EnrollmentManager = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { setSelectedPackage, setOccupancyType } = useEnrollment();
+  const { isAuthenticated } = useAuth();
+  const { checkAuthAndProceed } = useAuthDialogContext();
   
   useEffect(() => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      checkAuthAndProceed('/enroll', () => {
+        // This callback won't execute since the user isn't authenticated yet
+        // When the user successfully logs in, they'll be redirected back here
+      });
+    }
+    
     // Parse package ID from URL query parameters
     const searchParams = new URLSearchParams(location.search);
     const packageId = searchParams.get('package');
@@ -110,7 +122,7 @@ const EnrollmentManager = () => {
         navigate('/enroll/visitors');
       }
     }
-  }, [location.search, setSelectedPackage, setOccupancyType, navigate]);
+  }, [location.search, setSelectedPackage, setOccupancyType, navigate, isAuthenticated, checkAuthAndProceed]);
   
   const renderStep = () => {
     switch (step) {
@@ -126,6 +138,11 @@ const EnrollmentManager = () => {
         return <PackageSelection />;
     }
   };
+
+  // If not authenticated, render nothing (auth dialog will be shown)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <>

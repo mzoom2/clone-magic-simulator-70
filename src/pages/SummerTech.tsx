@@ -1,17 +1,20 @@
 
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PricingCard from '@/components/PricingCard';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
 import BackToTop from '@/components/BackToTop';
-import { Link } from 'react-router-dom';
+import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
 
 const SummerTech = () => {
   const descriptionRef = useRef<HTMLDivElement>(null);
   const pricingRef = useRef<HTMLDivElement>(null);
   const paymentRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { checkAuthAndProceed } = useAuthDialogContext();
   
   useEffect(() => {
     const observerOptions = {
@@ -38,6 +41,12 @@ const SummerTech = () => {
       observer.disconnect();
     };
   }, []);
+  
+  const handleBookNow = () => {
+    checkAuthAndProceed('/enroll?package=summer-tech', () => {
+      navigate('/enroll?package=summer-tech');
+    });
+  };
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -72,13 +81,11 @@ const SummerTech = () => {
             Hotel, transport, activities, and a week full of activities— it's all covered. You get your flight, we get everything else.
           </p>
           <Button 
-            asChild
             className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black font-medium px-6 md:px-8 py-4 md:py-6 h-auto text-sm md:text-base rounded-full w-full sm:w-auto group"
+            onClick={handleBookNow}
           >
-            <Link to="/enroll?package=summer-tech">
-              BOOK NOW
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
+            BOOK NOW
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </div>
       </section>
@@ -100,6 +107,7 @@ const SummerTech = () => {
                 "Meals & Activities",
                 "Introductions"
               ]}
+              onBookNow={handleBookNow}
             />
 
             {/* Single Occupancy Card */}
@@ -115,6 +123,7 @@ const SummerTech = () => {
                 "Meals & Activities",
                 "Introductions"
               ]}
+              onBookNow={handleBookNow}
             />
           </div>
         </div>
