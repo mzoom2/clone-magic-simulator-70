@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -116,10 +117,10 @@ const DashboardPage = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      <main className="flex-grow pt-24 pb-12">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-forest">Dashboard</h1>
+      <main className="flex-grow pt-24 pb-12 px-4">
+        <div className="container mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-forest">Dashboard</h1>
             <Button 
               variant="outline" 
               onClick={handleLogout}
@@ -130,22 +131,22 @@ const DashboardPage = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+            <Card className="h-full">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl font-medium">Profile</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between flex-wrap gap-1">
                     <span className="text-gray-500">Name:</span>
                     <span className="font-medium">{user?.first_name} {user?.last_name}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between flex-wrap gap-1">
                     <span className="text-gray-500">Email:</span>
-                    <span className="font-medium">{user?.email}</span>
+                    <span className="font-medium break-all">{user?.email}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between flex-wrap gap-1">
                     <span className="text-gray-500">Account type:</span>
                     <span className="font-medium capitalize">{user?.role}</span>
                   </div>
@@ -162,7 +163,7 @@ const DashboardPage = () => {
               </CardFooter>
             </Card>
             
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-2 h-full">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl font-medium">Recent Activity</CardTitle>
                 <CardDescription>Your recent bookings and payments</CardDescription>
@@ -183,13 +184,13 @@ const DashboardPage = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto -mx-4 sm:mx-0">
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Experience</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Date</TableHead>
+                          <TableHead className="hidden sm:table-cell">Amount</TableHead>
+                          <TableHead className="hidden sm:table-cell">Date</TableHead>
                           <TableHead>Status</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -197,8 +198,8 @@ const DashboardPage = () => {
                         {transactions.slice(0, 3).map((transaction) => (
                           <TableRow key={transaction.id}>
                             <TableCell className="font-medium">{transaction.package_title}</TableCell>
-                            <TableCell>{formatAmount(transaction.amount_cents)}</TableCell>
-                            <TableCell>{formatDate(transaction.created_at)}</TableCell>
+                            <TableCell className="hidden sm:table-cell">{formatAmount(transaction.amount_cents)}</TableCell>
+                            <TableCell className="hidden sm:table-cell">{formatDate(transaction.created_at)}</TableCell>
                             <TableCell className="flex items-center">
                               {getStatusIcon(transaction.status)}
                               <span className="ml-2 capitalize">{transaction.status}</span>
@@ -228,28 +229,28 @@ const DashboardPage = () => {
                   <p>No transactions found.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Experience</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Date</TableHead>
+                        <TableHead className="hidden sm:table-cell">Amount</TableHead>
+                        <TableHead className="hidden sm:table-cell">Date</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Attended</TableHead>
+                        <TableHead className="hidden sm:table-cell">Attended</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {transactions.map((transaction) => (
                         <TableRow key={transaction.id}>
                           <TableCell className="font-medium">{transaction.package_title}</TableCell>
-                          <TableCell>{formatAmount(transaction.amount_cents)}</TableCell>
-                          <TableCell>{formatDate(transaction.created_at)}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{formatAmount(transaction.amount_cents)}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{formatDate(transaction.created_at)}</TableCell>
                           <TableCell className="flex items-center">
                             {getStatusIcon(transaction.status)}
                             <span className="ml-2 capitalize">{transaction.status}</span>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden sm:table-cell">
                             {transaction.attended ? (
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 Yes

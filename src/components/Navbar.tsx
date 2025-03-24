@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "./ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -27,6 +28,7 @@ const Navbar = () => {
   const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   // Determine active page based on route
   const [activePage, setActivePage] = useState('Home');
@@ -43,6 +45,8 @@ const Navbar = () => {
       setActivePage('Catalogue');
     } else if (location.pathname.includes('enroll')) {
       setActivePage('Enroll');
+    } else if (location.pathname.includes('dashboard')) {
+      setActivePage('Dashboard');
     }
   }, [location]);
 
@@ -78,6 +82,8 @@ const Navbar = () => {
         return '/catalogue';
       case 'Enroll':
         return '/enroll';
+      case 'Dashboard':
+        return '/dashboard';
       default:
         return '/';
     }
@@ -93,7 +99,7 @@ const Navbar = () => {
   ];
 
   // Determine if the current page has a hero section with a transparent navbar
-  const hasHeroSection = !location.pathname.includes('enroll');
+  const hasHeroSection = !location.pathname.includes('enroll') && !location.pathname.includes('dashboard');
   
   // Determine the appropriate background based on scrolled state and current page
   const navbarBackground = scrolled || !hasHeroSection
@@ -103,6 +109,11 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+    setIsMenuOpen(false);
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
   };
 
   return (
@@ -196,8 +207,13 @@ const Navbar = () => {
                 />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="p-6">
-              <nav className="flex flex-col space-y-6 pt-8">
+            <SheetContent side="right" className="p-6 w-[80vw] max-w-[300px]">
+              <div className="flex justify-end mb-6">
+                <SheetClose className="rounded-full hover:bg-gray-100 p-1">
+                  <X size={24} className="text-forest" />
+                </SheetClose>
+              </div>
+              <nav className="flex flex-col space-y-6 pt-2">
                 {navItems.map((item) => (
                   <Link 
                     key={item} 
@@ -249,10 +265,7 @@ const Navbar = () => {
                       Dashboard
                     </Link>
                     <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMenuOpen(false);
-                      }}
+                      onClick={handleLogout}
                       className="flex items-center gap-2 text-lg font-medium text-red-600 hover:text-red-700 transition-colors"
                     >
                       <LogOut size={18} />
