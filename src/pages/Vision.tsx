@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -48,7 +47,6 @@ const Vision = () => {
           <video 
             className="w-full h-full object-cover"
             autoPlay
-            muted
             loop
             playsInline
           >
