@@ -23,6 +23,10 @@ export const useAuthDialog = () => {
   const openAuthDialog = useCallback((path?: string) => {
     // Don't open if already authenticated
     if (isAuthenticated) {
+      // If authenticated and path is provided, redirect directly
+      if (path) {
+        window.location.href = path;
+      }
       return;
     }
     

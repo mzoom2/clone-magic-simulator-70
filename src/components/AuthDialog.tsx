@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 interface AuthDialogProps {
@@ -25,7 +24,6 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose, redirectPath }
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { login, register, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
 
   // Clean up form state when dialog closes
   useEffect(() => {
@@ -45,10 +43,11 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose, redirectPath }
       onClose();
       
       if (redirectPath) {
-        navigate(redirectPath);
+        // Use window.location for navigation instead of useNavigate
+        window.location.href = redirectPath;
       }
     }
-  }, [isAuthenticated, isOpen, onClose, navigate, redirectPath]);
+  }, [isAuthenticated, isOpen, onClose, redirectPath]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +73,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose, redirectPath }
         });
         
         if (redirectPath) {
-          navigate(redirectPath);
+          // Use window.location for navigation instead of useNavigate
+          window.location.href = redirectPath;
         }
         
         onClose();
@@ -120,7 +120,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose, redirectPath }
         });
         
         if (redirectPath) {
-          navigate(redirectPath);
+          // Use window.location for navigation instead of useNavigate
+          window.location.href = redirectPath;
         }
         
         onClose();
