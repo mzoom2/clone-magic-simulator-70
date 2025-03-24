@@ -24,7 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Edit, Save, X, Check, Users, Package, CreditCard, User } from 'lucide-react';
+import { Edit, Save, X, Check, Users, Package, CreditCard, User, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Transaction management component
@@ -165,6 +165,17 @@ const TransactionManagement = () => {
     }
   };
 
+  // Filter for pending transactions
+  const pendingTransactions = transactions.filter(t => t.status === 'pending');
+  
+  // Filter for approved transactions (completed and attended)
+  const approvedTransactions = transactions.filter(t => t.status === 'completed' && t.attended === true);
+  
+  // Filter for all other transactions (that aren't pending or approved)
+  const otherTransactions = transactions.filter(t => 
+    !(t.status === 'pending' || (t.status === 'completed' && t.attended === true))
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -183,100 +194,167 @@ const TransactionManagement = () => {
         ) : transactions.length === 0 ? (
           <div className="text-center py-8">No transactions found</div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Package</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Attended</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {transactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>{transaction.id}</TableCell>
-                    <TableCell>
-                      {transaction.first_name} {transaction.last_name}
-                      <div className="text-xs text-gray-500">{transaction.email}</div>
-                    </TableCell>
-                    <TableCell>{transaction.package_title}</TableCell>
-                    <TableCell>{formatAmount(transaction.amount_cents)}</TableCell>
-                    <TableCell>{formatDate(transaction.created_at)}</TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        transaction.status === 'completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : transaction.status === 'canceled' 
-                            ? 'bg-red-100 text-red-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {transaction.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {transaction.status === 'completed' ? (
-                          <>
-                            <Checkbox 
-                              id={`attended-${transaction.id}`}
-                              checked={transaction.attended}
-                              onCheckedChange={(checked) => {
-                                console.log('Checkbox clicked:', checked);
-                                handleAttendanceChange(transaction.id, checked);
-                              }}
-                            />
-                            <label 
-                              htmlFor={`attended-${transaction.id}`}
-                              className="text-sm cursor-pointer"
-                              onClick={() => {
-                                const newValue = !transaction.attended;
-                                console.log('Label clicked, setting to:', newValue);
-                                handleAttendanceChange(transaction.id, newValue);
-                              }}
-                            >
-                              {transaction.attended ? 'Yes' : 'No'}
-                            </label>
-                          </>
-                        ) : (
-                          <span className="text-sm text-gray-500">N/A</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {transaction.status === 'completed' && !transaction.attended ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex items-center" 
-                          onClick={() => markAsAttended(transaction.id)}
-                        >
-                          <Check className="mr-1 h-4 w-4" /> Mark Attended
-                        </Button>
-                      ) : transaction.status === 'pending' ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex items-center text-yellow-700 bg-yellow-50 border-yellow-200 hover:bg-yellow-100" 
-                          onClick={() => updateTransactionStatus(transaction.id)}
-                        >
-                          <Check className="mr-1 h-4 w-4" /> Mark Completed & Attended
-                        </Button>
-                      ) : null}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="all">All Transactions</TabsTrigger>
+              <TabsTrigger value="pending">Pending ({pendingTransactions.length})</TabsTrigger>
+              <TabsTrigger value="approved">Approved ({approvedTransactions.length})</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="all">
+              <TransactionTable 
+                transactions={transactions} 
+                formatAmount={formatAmount} 
+                formatDate={formatDate} 
+                handleAttendanceChange={handleAttendanceChange}
+                markAsAttended={markAsAttended}
+                updateTransactionStatus={updateTransactionStatus}
+              />
+            </TabsContent>
+            
+            <TabsContent value="pending">
+              {pendingTransactions.length === 0 ? (
+                <div className="text-center py-8">No pending transactions</div>
+              ) : (
+                <TransactionTable 
+                  transactions={pendingTransactions} 
+                  formatAmount={formatAmount} 
+                  formatDate={formatDate} 
+                  handleAttendanceChange={handleAttendanceChange}
+                  markAsAttended={markAsAttended}
+                  updateTransactionStatus={updateTransactionStatus}
+                />
+              )}
+            </TabsContent>
+            
+            <TabsContent value="approved">
+              {approvedTransactions.length === 0 ? (
+                <div className="text-center py-8">No approved transactions</div>
+              ) : (
+                <TransactionTable 
+                  transactions={approvedTransactions} 
+                  formatAmount={formatAmount} 
+                  formatDate={formatDate} 
+                  handleAttendanceChange={handleAttendanceChange}
+                  markAsAttended={markAsAttended}
+                  updateTransactionStatus={updateTransactionStatus}
+                  isApprovedTab={true}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </CardContent>
     </Card>
+  );
+};
+
+// Extracted TransactionTable component to reduce duplication
+const TransactionTable = ({ 
+  transactions, 
+  formatAmount, 
+  formatDate, 
+  handleAttendanceChange, 
+  markAsAttended, 
+  updateTransactionStatus,
+  isApprovedTab = false
+}) => {
+  return (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Package</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Attended</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {transactions.map((transaction) => (
+            <TableRow key={transaction.id}>
+              <TableCell>{transaction.id}</TableCell>
+              <TableCell>
+                {transaction.first_name} {transaction.last_name}
+                <div className="text-xs text-gray-500">{transaction.email}</div>
+              </TableCell>
+              <TableCell>{transaction.package_title}</TableCell>
+              <TableCell>{formatAmount(transaction.amount_cents)}</TableCell>
+              <TableCell>{formatDate(transaction.created_at)}</TableCell>
+              <TableCell>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  transaction.status === 'completed' 
+                    ? 'bg-green-100 text-green-800' 
+                    : transaction.status === 'canceled' 
+                      ? 'bg-red-100 text-red-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {transaction.status}
+                </span>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center space-x-2">
+                  {transaction.status === 'completed' ? (
+                    <>
+                      <Checkbox 
+                        id={`attended-${transaction.id}`}
+                        checked={transaction.attended}
+                        onCheckedChange={(checked) => {
+                          console.log('Checkbox clicked:', checked);
+                          handleAttendanceChange(transaction.id, checked);
+                        }}
+                      />
+                      <label 
+                        htmlFor={`attended-${transaction.id}`}
+                        className="text-sm cursor-pointer"
+                        onClick={() => {
+                          const newValue = !transaction.attended;
+                          console.log('Label clicked, setting to:', newValue);
+                          handleAttendanceChange(transaction.id, newValue);
+                        }}
+                      >
+                        {transaction.attended ? 'Yes' : 'No'}
+                      </label>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500">N/A</span>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                {isApprovedTab ? (
+                  <div className="flex items-center text-green-600">
+                    <CheckCircle className="mr-1 h-4 w-4" /> Approved
+                  </div>
+                ) : transaction.status === 'completed' && !transaction.attended ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center" 
+                    onClick={() => markAsAttended(transaction.id)}
+                  >
+                    <Check className="mr-1 h-4 w-4" /> Mark Attended
+                  </Button>
+                ) : transaction.status === 'pending' ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center text-yellow-700 bg-yellow-50 border-yellow-200 hover:bg-yellow-100" 
+                    onClick={() => updateTransactionStatus(transaction.id)}
+                  >
+                    <Check className="mr-1 h-4 w-4" /> Mark Completed & Attended
+                  </Button>
+                ) : null}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 
