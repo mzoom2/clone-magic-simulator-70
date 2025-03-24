@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown, LogOut, User, Home } from "lucide-react";
@@ -192,12 +193,12 @@ const Navbar = () => {
           </div>
         </nav>
         
-        {/* Mobile hamburger menu */}
+        {/* Mobile hamburger menu - improved version */}
         {isMobile && (
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
               <button 
-                className="md:hidden focus:outline-none p-1"
+                className="md:hidden focus:outline-none p-1.5 rounded-md hover:bg-black/5"
                 aria-label="Toggle menu"
               >
                 <Menu 
@@ -206,81 +207,114 @@ const Navbar = () => {
                 />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="p-6 w-[80vw] max-w-[300px]">
-              <div className="flex justify-end mb-6">
-                <SheetClose className="rounded-full hover:bg-gray-100 p-1">
-                  <X size={24} className="text-forest" />
-                </SheetClose>
-              </div>
-              <nav className="flex flex-col space-y-6 pt-2">
-                {navItems.map((item) => (
-                  <Link 
-                    key={item} 
-                    to={getNavItemPath(item)}
-                    className={cn(
-                      "text-lg font-medium hover:text-forest transition-colors",
-                      item === activePage && "text-forest border-b border-forest pb-1"
-                    )}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                ))}
+            <SheetContent side="right" className="p-0 w-[80vw] max-w-[300px] border-l border-forest/20">
+              <div className="flex flex-col h-full">
+                {/* Mobile menu header */}
+                <div className="p-4 border-b border-forest/10 flex items-center justify-between">
+                  <span className="font-serif text-xl text-forest">kàábọ̀</span>
+                  <SheetClose className="rounded-full p-1.5 hover:bg-gray-100">
+                    <X size={20} className="text-forest" />
+                  </SheetClose>
+                </div>
                 
-                {/* Mobile Catalogue link and dropdown */}
-                <div className="space-y-4">
-                  <Link
-                    to="/catalogue"
-                    className={cn(
-                      "block text-lg font-medium hover:text-forest transition-colors",
-                      location.pathname.includes('catalogue') && "text-forest border-b border-forest pb-1"
-                    )}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Catalogue
-                  </Link>
-                  <div className="pl-4 flex flex-col space-y-3">
-                    {catalogueItems.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.path}
-                        className="text-base hover:text-forest transition-colors"
+                {/* User section if logged in */}
+                {isAuthenticated && user && (
+                  <div className="px-4 py-3 border-b border-forest/10 bg-forest/5">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-forest/20 flex items-center justify-center">
+                        <User size={18} className="text-forest" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-forest">
+                          {user.first_name} {user.last_name}
+                        </p>
+                        <p className="text-xs text-forest/70">{user.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Mobile navigation menu */}
+                <div className="flex-1 overflow-auto py-2">
+                  <nav className="flex flex-col">
+                    {/* Dashboard link for logged in users */}
+                    {isAuthenticated && (
+                      <Link 
+                        to="/dashboard"
+                        className="flex items-center gap-2 px-4 py-3 text-forest hover:bg-forest/5"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        {item.name}
+                        <Home size={18} />
+                        <span>Dashboard</span>
+                      </Link>
+                    )}
+                    
+                    {/* Main navigation items */}
+                    {navItems.map((item) => (
+                      <Link 
+                        key={item} 
+                        to={getNavItemPath(item)}
+                        className={cn(
+                          "px-4 py-3 hover:bg-forest/5",
+                          item === activePage ? "text-forest font-medium" : "text-gray-700"
+                        )}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item}
                       </Link>
                     ))}
-                  </div>
+                    
+                    {/* Catalogue section */}
+                    <div className="px-4 py-3 hover:bg-forest/5">
+                      <Link
+                        to="/catalogue"
+                        className={cn(
+                          "block",
+                          location.pathname.includes('catalogue') ? "text-forest font-medium" : "text-gray-700"
+                        )}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Catalogue
+                      </Link>
+                    </div>
+                    
+                    {/* Catalogue items with indentation */}
+                    <div className="pl-8 pr-4 pb-2 space-y-1">
+                      {catalogueItems.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.path}
+                          className="block py-2 text-sm text-gray-600 hover:text-forest"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </nav>
                 </div>
-
-                {isAuthenticated ? (
-                  <>
-                    <Link 
-                      to="/dashboard"
-                      className="flex items-center gap-2 text-lg font-medium hover:text-forest transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <User size={18} />
-                      Dashboard
-                    </Link>
+                
+                {/* Mobile menu footer with auth actions */}
+                <div className="mt-auto p-4 border-t border-forest/10">
+                  {isAuthenticated ? (
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-2 text-lg font-medium text-red-600 hover:text-red-700 transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2.5 rounded-md bg-red-50 text-red-600 hover:bg-red-100"
                     >
                       <LogOut size={18} />
-                      Logout
+                      <span>Logout</span>
                     </button>
-                  </>
-                ) : (
-                  <Link 
-                    to="/enroll"
-                    className="bg-forest text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-90 mt-4 text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    ENROLL NOW
-                  </Link>
-                )}
-              </nav>
+                  ) : (
+                    <Link 
+                      to="/enroll"
+                      className="block w-full text-center bg-forest text-white py-2.5 px-6 rounded-md font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      ENROLL NOW
+                    </Link>
+                  )}
+                </div>
+              </div>
             </SheetContent>
           </Sheet>
         )}
