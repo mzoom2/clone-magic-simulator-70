@@ -16,6 +16,11 @@ export const useAuthDialog = () => {
       closeAuthDialog();
     }
     
+    // Store auth state in session storage to prevent repeated popups
+    if (isAuthenticated && !hasBeenAuthenticated.current) {
+      sessionStorage.setItem('auth_dialog_closed', 'true');
+    }
+    
     // Update the ref when auth state changes
     hasBeenAuthenticated.current = isAuthenticated;
   }, [isAuthenticated, isDialogOpen]);
@@ -36,6 +41,12 @@ export const useAuthDialog = () => {
       return;
     }
     
+    // Check if we've shown the dialog in this session and user closed it
+    // This prevents the dialog from appearing repeatedly for authenticated users
+    if (sessionStorage.getItem('auth_dialog_closed') === 'true') {
+      return;
+    }
+    
     // Set the redirect path if provided
     if (path) {
       setRedirectPath(path);
@@ -49,6 +60,9 @@ export const useAuthDialog = () => {
     setIsDialogOpen(false);
     setRedirectPath(undefined);
     lastClosedTime.current = Date.now();
+    
+    // Mark the dialog as closed in this session
+    sessionStorage.setItem('auth_dialog_closed', 'true');
   }, []);
   
   const checkAuthAndProceed = useCallback((path: string, onAuthenticated: () => void) => {

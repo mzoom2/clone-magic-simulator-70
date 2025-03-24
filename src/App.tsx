@@ -40,6 +40,10 @@ const CheckAuthToken = () => {
     if (authToken && !token && !tokenProcessed) {
       console.log('Found auth token in URL, restoring session');
       localStorage.setItem('auth_token', authToken);
+      
+      // Clear any auth dialog closed flag since user is now being authenticated
+      sessionStorage.removeItem('auth_dialog_closed');
+      
       refreshUserData();
       setTokenProcessed(true);
       

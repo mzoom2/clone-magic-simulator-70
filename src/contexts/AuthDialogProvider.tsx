@@ -36,7 +36,7 @@ export const AuthDialogProvider: React.FC<AuthDialogProviderProps> = ({ children
   
   const { isAuthenticated } = useAuth();
   
-  // Close the dialog when auth state changes
+  // Close the dialog when auth state changes to authenticated
   useEffect(() => {
     if (isAuthenticated && isDialogOpen) {
       closeAuthDialog();

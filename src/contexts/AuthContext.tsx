@@ -99,6 +99,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('auth_user', JSON.stringify(data.user));
         
+        // Clear any previous auth dialog closed flag since user is now logged in
+        sessionStorage.removeItem('auth_dialog_closed');
+        
         toast({
           title: 'Login successful',
           description: `Welcome back, ${data.user.first_name || 'User'}!`,

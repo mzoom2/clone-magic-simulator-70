@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
@@ -20,16 +19,12 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { isAuthenticated, token, user } = useAuth();
+  const { isAuthenticated, token, user, refreshUserData } = useAuth();
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
+  const [isProcessingAuth, setIsProcessingAuth] = useState(false);
 
   // Handle return from Stripe Checkout
   useEffect(() => {
-    if (!isAuthenticated) {
-      console.log('User not authenticated on payment page, will redirect soon');
-      // Don't redirect immediately as auth token may be in URL and being processed
-    }
-    
     // Check for success or cancel status from Stripe redirect
     const query = new URLSearchParams(location.search);
     const status = query.get('payment_status');
@@ -43,9 +38,21 @@ const Payment = () => {
     // we should update the auth state first before proceeding
     if (authToken && !token) {
       console.log('Found auth token in URL, restoring session');
+      setIsProcessingAuth(true);
       localStorage.setItem('auth_token', authToken);
-      // After setting the token, reload the page to reinitialize auth context
-      window.location.href = '/dashboard';
+      
+      // Clear any auth dialog closed flag since user is being authenticated
+      sessionStorage.removeItem('auth_dialog_closed');
+      
+      // After setting the token, refresh user data
+      refreshUserData().then(() => {
+        // Clear the auth token from URL
+        const newUrl = window.location.pathname + 
+          (location.search ? location.search.replace(/(&|\?)auth_token=[^&]+/, '') : '');
+        window.history.replaceState({}, '', newUrl);
+        
+        setIsProcessingAuth(false);
+      });
       return;
     }
     
@@ -56,9 +63,11 @@ const Payment = () => {
         description: "Your booking has been confirmed. Thank you for choosing us!",
       });
       
-      // Reset enrollment and redirect to dashboard immediately
-      resetEnrollment();
-      navigate('/dashboard');
+      // Reset enrollment and redirect to dashboard after short delay
+      setTimeout(() => {
+        resetEnrollment();
+        navigate('/dashboard');
+      }, 1500);
     } else if (status === 'canceled') {
       setPaymentStatus('canceled');
       toast({
@@ -74,13 +83,13 @@ const Payment = () => {
         variant: "destructive",
       });
     }
-  }, [location.search, toast, navigate, resetEnrollment, isAuthenticated, token]);
+  }, [location.search, toast, navigate, resetEnrollment, isAuthenticated, token, refreshUserData]);
 
   // Redirect to enrollment start if package is not selected
   useEffect(() => {
     // Add delay to allow auth token processing
     const redirectTimer = setTimeout(() => {
-      if (!isAuthenticated) {
+      if (!isProcessingAuth && !isAuthenticated) {
         console.log('User not authenticated after delay, redirecting to login');
         navigate('/login');
         return;
@@ -89,10 +98,10 @@ const Payment = () => {
       if (!selectedPackage || !occupancyType) {
         navigate('/enroll');
       }
-    }, 500); // Short delay to allow auth processing
+    }, 800); // Slightly longer delay to allow auth processing
 
     return () => clearTimeout(redirectTimer);
-  }, [selectedPackage, occupancyType, navigate, isAuthenticated]);
+  }, [selectedPackage, occupancyType, navigate, isAuthenticated, isProcessingAuth]);
 
   const handleBack = () => {
     navigate('/enroll/summary');
