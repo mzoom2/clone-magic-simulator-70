@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useStripe } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CreditCard, CheckCircle2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CheckoutFormProps {
   amount: string;
@@ -14,9 +14,7 @@ interface CheckoutFormProps {
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuccess }) => {
   const stripe = useStripe();
-  const elements = useElements();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,16 +24,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
     return numericAmount * 100; // Convert to cents
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
+  const handleCheckout = async () => {
+    if (!stripe) {
       // Stripe.js has not loaded yet
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
       return;
     }
 
@@ -43,53 +34,43 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
     setError(null);
 
     try {
-      // In a real implementation, you would create a payment intent on your server
-      // and return the client secret to use here
-      // This is just a mock implementation for demonstration
-
-      // Simulate API call to create payment intent
-      const mockCreatePaymentIntent = async () => {
-        return new Promise<{ clientSecret: string }>((resolve) => {
+      // In a real implementation, you would call your backend API to create a Checkout Session
+      // For demonstration, we'll simulate this process
+      
+      // Mock API call to create checkout session
+      const createCheckoutSession = async () => {
+        return new Promise<{ sessionId: string }>((resolve) => {
+          // In production, you'd make a real API call to your server here
           setTimeout(() => {
-            // This is a fake client secret
-            resolve({ clientSecret: 'pi_mock_secret_' + Math.random().toString(36).substr(2, 9) });
+            resolve({ 
+              sessionId: 'cs_test_' + Math.random().toString(36).substr(2, 9) 
+            });
           }, 1000);
         });
       };
 
-      const { clientSecret } = await mockCreatePaymentIntent();
-
-      // Confirm the payment with the card element
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: 'Test User',
-          },
-        },
+      // Get checkout session ID from backend
+      const { sessionId } = await createCheckoutSession();
+      
+      // Redirect to Stripe Checkout
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: sessionId
       });
 
-      if (result.error) {
-        setError(result.error.message || 'An error occurred during payment processing');
+      if (error) {
+        setError(error.message || 'An error occurred during checkout');
         toast({
-          title: "Payment Failed",
-          description: result.error.message || 'Something went wrong with your payment',
+          title: "Checkout Failed",
+          description: error.message || 'Something went wrong with the checkout process',
           variant: "destructive",
         });
-      } else {
-        // The payment has been processed!
-        toast({
-          title: "Payment Successful!",
-          description: `Your booking for ${packageTitle} has been confirmed.`,
-        });
-        onSuccess();
       }
     } catch (err) {
-      console.error('Error processing payment:', err);
+      console.error('Error initiating checkout:', err);
       setError('An unexpected error occurred. Please try again.');
       toast({
-        title: "Payment Error",
-        description: "There was a problem processing your payment. Please try again.",
+        title: "Checkout Error",
+        description: "There was a problem initiating the checkout process. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -98,47 +79,59 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="p-4 border border-gray-200 rounded-md bg-white">
-        <CardElement 
-          options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#424770',
-                '::placeholder': {
-                  color: '#aab7c4',
-                },
-              },
-              invalid: {
-                color: '#9e2146',
-              },
-            },
-          }}
-        />
-      </div>
+    <Card className="border-2 border-gray-100 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-medium">Secure Checkout</CardTitle>
+        <CardDescription>
+          You'll be redirected to Stripe's secure payment platform
+        </CardDescription>
+      </CardHeader>
       
-      {error && (
-        <div className="text-destructive text-sm mt-2">
-          {error}
+      <CardContent className="space-y-4">
+        <div className="flex flex-col space-y-3">
+          <div className="flex justify-between text-sm px-1">
+            <span className="text-gray-500">Package</span>
+            <span className="font-medium">{packageTitle}</span>
+          </div>
+          
+          <div className="flex justify-between text-sm px-1">
+            <span className="text-gray-500">Total Amount</span>
+            <span className="font-medium">${amount}</span>
+          </div>
+          
+          <div className="flex items-center mt-3 text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
+            <CheckCircle2 className="h-4 w-4 mr-2 text-forest" />
+            <span>Your information is processed securely through Stripe</span>
+          </div>
         </div>
-      )}
+      </CardContent>
       
-      <Button 
-        type="submit" 
-        disabled={!stripe || isLoading}
-        className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black rounded-full px-8 py-6 h-auto text-base font-medium w-full sm:w-auto"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          `Pay $${amount}`
+      <CardFooter className="pt-2">
+        <Button 
+          onClick={handleCheckout} 
+          disabled={!stripe || isLoading}
+          className="bg-[#f8b13f] hover:bg-[#f8b13f]/90 text-black rounded-full px-8 py-6 h-auto text-base font-medium w-full"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Preparing Checkout...
+            </>
+          ) : (
+            <>
+              <CreditCard className="mr-2 h-5 w-5" />
+              Pay ${amount} Securely
+            </>
+          )}
+        </Button>
+        
+        {error && (
+          <div className="text-destructive text-sm mt-4 w-full text-center">
+            {error}
+          </div>
         )}
-      </Button>
-    </form>
+      </CardFooter>
+    </Card>
   );
 };
 

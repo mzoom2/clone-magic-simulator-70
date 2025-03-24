@@ -1,10 +1,11 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useEnrollment } from '@/contexts/EnrollmentContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 import CheckoutForm from '../stripe/CheckoutForm';
 import StripeProvider from '../stripe/StripeProvider';
 
@@ -16,6 +17,34 @@ const Payment = () => {
     resetEnrollment
   } = useEnrollment();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  // Handle return from Stripe Checkout
+  useEffect(() => {
+    // Check for success or cancel status from Stripe redirect
+    const query = new URLSearchParams(location.search);
+    const paymentStatus = query.get('payment_status');
+    
+    if (paymentStatus === 'success') {
+      toast({
+        title: "Payment Successful!",
+        description: "Your booking has been confirmed. Thank you for choosing us!",
+      });
+      
+      // Reset enrollment and redirect
+      resetEnrollment();
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+    } else if (paymentStatus === 'canceled') {
+      toast({
+        title: "Payment Canceled",
+        description: "Your payment was not completed. You can try again.",
+        variant: "destructive",
+      });
+    }
+  }, [location, toast, navigate, resetEnrollment]);
 
   if (!selectedPackage || !occupancyType) {
     navigate('/enroll');
@@ -27,13 +56,9 @@ const Payment = () => {
   };
 
   const handlePaymentSuccess = () => {
-    // Reset enrollment data after successful payment
-    resetEnrollment();
-    
-    // Navigate to home page or confirmation page
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+    // This will be triggered when we handle redirect back from Stripe
+    // The actual success is handled in the useEffect above
+    console.log('Payment initiated');
   };
 
   return (
@@ -44,16 +69,46 @@ const Payment = () => {
         </h2>
         
         <Card className="border-2 border-gray-200 mb-8">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
-              <h3 className="text-xl font-medium">{selectedPackage.title}</h3>
+          <CardHeader className="p-6 pb-0">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-xl font-semibold text-forest">{selectedPackage.title}</CardTitle>
               <span className="text-xl font-bold text-forest">${calculateTotalPrice()}</span>
             </div>
-            
+            <CardDescription className="text-gray-600 mt-2">
+              Secure payment powered by Stripe
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="p-6">
             <div className="mb-6">
-              <p className="text-sm text-gray-600 mb-2">
-                Enter your card details to complete your purchase. Your information is secure and encrypted.
-              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-700">Package Details</h4>
+                  <p className="text-sm text-gray-600">{selectedPackage.description}</p>
+                  <p className="text-sm text-gray-600 font-semibold">{selectedPackage.date}</p>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">Payment Methods</h4>
+                  <div className="flex flex-wrap gap-2">
+                    <div className="bg-gray-100 p-2 rounded">
+                      <CreditCard size={18} className="text-gray-700" />
+                    </div>
+                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                      Visa
+                    </div>
+                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                      Mastercard
+                    </div>
+                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                      AMEX
+                    </div>
+                    <div className="bg-gray-100 px-3 py-1 rounded text-xs flex items-center">
+                      And more
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               <CheckoutForm 
                 amount={calculateTotalPrice()} 
