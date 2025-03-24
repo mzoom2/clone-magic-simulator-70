@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +31,31 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   
   const { login, register } = useAuth();
   const { toast } = useToast();
+  
+  // Add state to track the previous page
+  const [previousPage, setPreviousPage] = useState<string | null>(null);
+
+  // Store the previous page when the dialog opens
+  useEffect(() => {
+    if (isOpen && !previousPage) {
+      setPreviousPage(document.referrer || '/');
+    }
+  }, [isOpen, previousPage]);
+
+  const handleDialogClose = () => {
+    // Navigate back to previous page if on enrollment
+    if (window.location.pathname.includes('/enroll')) {
+      if (previousPage && previousPage !== window.location.href) {
+        window.location.href = previousPage;
+      } else {
+        // Fallback to homepage if no valid previous page
+        window.location.href = '/';
+      }
+    }
+    
+    // Call the original onClose handler
+    onClose();
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +108,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">Authentication Required</DialogTitle>
