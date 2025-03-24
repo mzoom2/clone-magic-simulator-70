@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +32,6 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
   
   const { login, register } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +48,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
         
         // Navigate to redirect path if provided
         if (redirectPath) {
-          navigate(redirectPath);
+          window.location.href = redirectPath;
         }
       }
     } catch (error) {
@@ -75,7 +73,7 @@ const AuthDialog = ({ isOpen, onClose, redirectPath }: AuthDialogProps) => {
         
         // Navigate to redirect path if provided
         if (redirectPath) {
-          navigate(redirectPath);
+          window.location.href = redirectPath;
         }
       }
     } catch (error) {
