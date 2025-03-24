@@ -21,7 +21,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle, XCircle, Clock, LogOut } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Clock, LogOut, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Transaction {
@@ -104,6 +104,27 @@ const DashboardPage = () => {
     }
   };
 
+  const getAttendanceStatus = (transaction: Transaction) => {
+    if (transaction.status !== 'completed') {
+      return null; // Only show attendance for completed transactions
+    }
+    
+    if (transaction.attended) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          Attended
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          <Calendar size={12} />
+          Upcoming
+        </span>
+      );
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -145,10 +166,6 @@ const DashboardPage = () => {
                   <div className="flex justify-between flex-wrap gap-1">
                     <span className="text-gray-500">Email:</span>
                     <span className="font-medium break-all">{user?.email}</span>
-                  </div>
-                  <div className="flex justify-between flex-wrap gap-1">
-                    <span className="text-gray-500">Account type:</span>
-                    <span className="font-medium capitalize">{user?.role}</span>
                   </div>
                 </div>
               </CardContent>
@@ -237,7 +254,7 @@ const DashboardPage = () => {
                         <TableHead className="hidden sm:table-cell">Amount</TableHead>
                         <TableHead className="hidden sm:table-cell">Date</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="hidden sm:table-cell">Attended</TableHead>
+                        <TableHead className="hidden sm:table-cell">Attendance</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -251,15 +268,7 @@ const DashboardPage = () => {
                             <span className="ml-2 capitalize">{transaction.status}</span>
                           </TableCell>
                           <TableCell className="hidden sm:table-cell">
-                            {transaction.attended ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Yes
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Not yet
-                              </span>
-                            )}
+                            {getAttendanceStatus(transaction)}
                           </TableCell>
                         </TableRow>
                       ))}
