@@ -1,8 +1,11 @@
+
 import React, { useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { PlayCircle, Volume2 } from "lucide-react";
+import { PlayCircle, Volume2, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const experiences = [
   {
@@ -51,19 +54,29 @@ const experiencePhotos = [
 const Experience = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const photosRef = useRef<HTMLDivElement>(null);
+  const bookNowRef = useRef<HTMLDivElement>(null);
   const isVisible = useIntersectionObserver(sectionRef, { threshold: 0.1 });
   const arePhotosVisible = useIntersectionObserver(photosRef, { threshold: 0.1 });
+  const isBookNowVisible = useIntersectionObserver(bookNowRef, { threshold: 0.1 });
 
   return (
-    <section id="experience" ref={sectionRef} className="py-20 md:py-28 px-6 bg-sand/50">
+    <section id="experience" ref={sectionRef} className="py-20 md:py-28 px-6 bg-gradient-to-b from-sand/30 to-sand/60">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 relative">
+          {/* Decorative elements */}
+          <div className="absolute -top-10 -left-10 w-20 h-20 rounded-full bg-cream/50 animate-pulse opacity-30"></div>
+          <div className="absolute -bottom-10 -right-10 w-16 h-16 rounded-full bg-forest/10 animate-pulse opacity-40 delay-700"></div>
+          
           <h2 className={cn(
             "font-serif text-3xl md:text-5xl mb-4 opacity-0 transform translate-y-4 transition-all duration-700",
             isVisible && "opacity-100 translate-y-0"
           )}>
             Past Experiences
           </h2>
+          <div className={cn(
+            "w-20 h-1 bg-amber-500 mx-auto mb-6 opacity-0 scale-x-0 transition-all duration-500 delay-300", 
+            isVisible && "opacity-100 scale-x-100"
+          )}></div>
           <p className={cn(
             "max-w-2xl mx-auto text-muted-foreground opacity-0 transform translate-y-4 transition-all duration-700 delay-100",
             isVisible && "opacity-100 translate-y-0"
@@ -77,7 +90,7 @@ const Experience = () => {
             <div 
               key={exp.id}
               className={cn(
-                "video-card group opacity-0 transform translate-y-4 transition-all duration-700",
+                "video-card group opacity-0 transform translate-y-4 transition-all duration-700 relative overflow-hidden rounded-lg h-60 md:h-80 cursor-pointer shadow-lg hover:shadow-xl",
                 isVisible && "opacity-100 translate-y-0"
               )}
               style={{ transitionDelay: `${200 + index * 100}ms` }}
@@ -85,13 +98,17 @@ const Experience = () => {
               <img 
                 src={exp.thumbnail} 
                 alt={exp.title} 
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-all duration-300"></div>
               
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <PlayCircle className="w-14 h-14 text-white opacity-90 mb-3 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-white text-lg font-medium">{exp.title}</h3>
+                <PlayCircle className="w-16 h-16 text-white opacity-90 mb-4 group-hover:scale-110 transition-transform duration-300 animate-pulse" />
+                <h3 className="text-white text-xl font-medium font-serif">{exp.title}</h3>
+                <div className={cn(
+                  "w-10 h-0.5 bg-white/70 mt-3 scale-x-0 transition-transform duration-300 delay-75",
+                  "group-hover:scale-x-100"
+                )}></div>
               </div>
               
               <div className="absolute bottom-4 right-4">
@@ -115,10 +132,10 @@ const Experience = () => {
               <Card 
                 key={photo.id}
                 className={cn(
-                  "overflow-hidden opacity-0 transform translate-y-4 transition-all duration-700",
+                  "overflow-hidden opacity-0 transform translate-y-4 transition-all duration-700 hover:shadow-lg border-transparent hover:border-amber-200/50",
                   arePhotosVisible && "opacity-100 translate-y-0"
                 )}
-                style={{ transitionDelay: `${200 + index * 100}ms` }}
+                style={{ transitionDelay: `${200 + index * 150}ms` }}
               >
                 <CardContent className="p-0">
                   <AspectRatio ratio={4/3} className="bg-muted">
@@ -129,12 +146,35 @@ const Experience = () => {
                     />
                     <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-300"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                      <h4 className="text-white font-medium">{photo.title}</h4>
+                      <h4 className="text-white font-medium transform translate-y-0 transition-transform duration-300 hover:translate-y-[-3px]">{photo.title}</h4>
                     </div>
                   </AspectRatio>
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div ref={bookNowRef} className="mt-20 text-center">
+          <div className={cn(
+            "p-8 bg-forest/5 rounded-xl border border-forest/10 opacity-0 transform translate-y-4 transition-all duration-700",
+            isBookNowVisible && "opacity-100 translate-y-0"
+          )}>
+            <h3 className="font-serif text-2xl md:text-3xl mb-4">Ready to Experience Nigeria?</h3>
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join us for a transformative journey that will connect you with the vibrant culture, 
+              business opportunities, and unforgettable experiences of Nigeria.
+            </p>
+            <Button 
+              asChild
+              className="bg-forest hover:bg-forest/90 text-white group px-6 py-6 h-auto text-base rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              <Link to="/enroll">
+                BOOK NOW
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
