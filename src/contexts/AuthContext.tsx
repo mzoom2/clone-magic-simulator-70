@@ -194,6 +194,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
     
+    // Clear auth_dialog_closed from sessionStorage when logging out
+    // This ensures the auth dialog will appear again when needed
+    sessionStorage.removeItem('auth_dialog_closed');
+    
     toast({
       title: 'Logged out',
       description: 'You have been successfully logged out.',
