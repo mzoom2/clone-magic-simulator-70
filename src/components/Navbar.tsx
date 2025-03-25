@@ -249,7 +249,7 @@ const Navbar = () => {
                       </Link>
                     )}
                     
-                    {/* Explore link for all users */}
+                    {/* Explore link for all users - Updated to point to /enroll */}
                     <Link 
                       to="/enroll"
                       className="flex items-center gap-2 px-4 py-3 text-forest hover:bg-forest/5"
@@ -331,7 +331,7 @@ const Navbar = () => {
         
         {/* Desktop action buttons */}
         <div className={cn("flex items-center gap-4", isMobile ? "hidden" : "flex")}>
-          {/* Explore button for all users */}
+          {/* Explore button for all users - Updated to point to /enroll */}
           <Button
             variant="ghost"
             className={cn(
