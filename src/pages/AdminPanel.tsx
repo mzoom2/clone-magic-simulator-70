@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
 import { useEnrollment, EnrollmentProvider } from '@/contexts/EnrollmentContext';
@@ -23,23 +24,76 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Edit, Save, X, Check, Users, Package, CreditCard, User, CheckCircle } from 'lucide-react';
+import { RefreshCw, Edit, Save, X, Check, Users, Package, CreditCard, User, CheckCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Transaction management component
 const TransactionManagement = () => {
   const { token } = useAuth();
   const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshTimestamp, setRefreshTimestamp] = useState(new Date());
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  
+  // Set up real-time refresh interval (15 seconds)
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setRefreshTimestamp(new Date());
+    }, 15000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // Fetch transactions when token or refresh timestamp changes
   useEffect(() => {
     fetchTransactions();
-  }, [token]);
+  }, [token, refreshTimestamp]);
+  
+  // Filter and paginate transactions when search term or transactions change
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const filtered = filterTransactions(transactions, searchTerm);
+      setFilteredTransactions(filtered);
+      setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+      setCurrentPage(1); // Reset to first page when filters change
+    }
+  }, [searchTerm, transactions, itemsPerPage]);
+
+  const filterTransactions = (txs, term) => {
+    if (!term) return txs;
+    
+    const lowercaseTerm = term.toLowerCase();
+    return txs.filter(tx => 
+      tx.id.toString().includes(lowercaseTerm) ||
+      tx.first_name?.toLowerCase().includes(lowercaseTerm) ||
+      tx.last_name?.toLowerCase().includes(lowercaseTerm) ||
+      tx.email?.toLowerCase().includes(lowercaseTerm) ||
+      tx.package_title?.toLowerCase().includes(lowercaseTerm) ||
+      tx.status?.toLowerCase().includes(lowercaseTerm)
+    );
+  };
 
   const fetchTransactions = async () => {
     if (!token) return;
     
     try {
+      setIsRefreshing(true);
       const response = await fetch('http://localhost:5000/transactions', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -57,7 +111,12 @@ const TransactionManagement = () => {
       toast.error('Could not connect to the server');
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
+  };
+
+  const handleRefresh = () => {
+    setRefreshTimestamp(new Date());
   };
 
   const formatAmount = (cents) => {
@@ -91,7 +150,7 @@ const TransactionManagement = () => {
       if (response.ok) {
         // Update local state
         setTransactions(transactions.map(t => 
-          t.id === transactionId ? { ...t, attended } : t
+          t.id === transactionId ? { ...t, attended, status: attended ? 'completed' : t.status } : t
         ));
         toast.success('Attendance status updated');
       } else {
@@ -131,12 +190,10 @@ const TransactionManagement = () => {
     }
   };
 
-  // Updated function to directly mark as attended when a transaction is pending
   const updateTransactionStatus = async (transactionId) => {
     if (!token) return;
     
     try {
-      // Directly use the attended endpoint since that's what we want to do
       const response = await fetch(`http://localhost:5000/transactions/${transactionId}/attended`, {
         method: 'PUT',
         headers: {
@@ -169,23 +226,47 @@ const TransactionManagement = () => {
     }
   };
 
+  // Get paginated data
+  const getPaginatedData = useCallback(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredTransactions.slice(startIndex, endIndex);
+  }, [filteredTransactions, currentPage, itemsPerPage]);
+
   // Filter for pending transactions
   const pendingTransactions = transactions.filter(t => t.status === 'pending');
   
   // Filter for approved transactions (completed and attended)
   const approvedTransactions = transactions.filter(t => t.status === 'completed' && t.attended === true);
   
-  // Filter for all other transactions (that aren't pending or approved)
-  const otherTransactions = transactions.filter(t => 
-    !(t.status === 'pending' || (t.status === 'completed' && t.attended === true))
-  );
+  // Get counts for all transaction types
+  const pendingCount = pendingTransactions.length;
+  const approvedCount = approvedTransactions.length;
+  const totalCount = transactions.length;
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center space-x-2">
-          <CreditCard className="h-5 w-5 text-forest" />
-          <CardTitle>Transaction Management</CardTitle>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center space-x-2">
+            <CreditCard className="h-5 w-5 text-forest" />
+            <CardTitle>Transaction Management</CardTitle>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="flex items-center gap-1" 
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
+            <div className="text-xs text-muted-foreground">
+              Auto-refreshes every 15s
+            </div>
+          </div>
         </div>
         <CardDescription>
           View and manage all customer transactions
@@ -198,36 +279,70 @@ const TransactionManagement = () => {
         ) : transactions.length === 0 ? (
           <div className="text-center py-8">No transactions found</div>
         ) : (
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="all">All Transactions</TabsTrigger>
-              <TabsTrigger value="pending">Pending ({pendingTransactions.length})</TabsTrigger>
-              <TabsTrigger value="approved">Approved ({approvedTransactions.length})</TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="pending" className="w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+              <TabsList className="grid grid-cols-3">
+                <TabsTrigger value="all">All ({totalCount})</TabsTrigger>
+                <TabsTrigger value="pending">Pending ({pendingCount})</TabsTrigger>
+                <TabsTrigger value="approved">Approved ({approvedCount})</TabsTrigger>
+              </TabsList>
+              
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search transactions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 w-full"
+                />
+              </div>
+            </div>
             
             <TabsContent value="all">
               <TransactionTable 
-                transactions={transactions} 
+                transactions={getPaginatedData()} 
                 formatAmount={formatAmount} 
                 formatDate={formatDate} 
                 handleAttendanceChange={handleAttendanceChange}
                 markAsAttended={markAsAttended}
                 updateTransactionStatus={updateTransactionStatus}
               />
+              {filteredTransactions.length > itemsPerPage && (
+                <PaginationControls 
+                  currentPage={currentPage} 
+                  totalPages={totalPages} 
+                  setCurrentPage={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={setItemsPerPage}
+                  totalItems={filteredTransactions.length}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="pending">
               {pendingTransactions.length === 0 ? (
                 <div className="text-center py-8">No pending transactions</div>
               ) : (
-                <TransactionTable 
-                  transactions={pendingTransactions} 
-                  formatAmount={formatAmount} 
-                  formatDate={formatDate} 
-                  handleAttendanceChange={handleAttendanceChange}
-                  markAsAttended={markAsAttended}
-                  updateTransactionStatus={updateTransactionStatus}
-                />
+                <>
+                  <TransactionTable 
+                    transactions={pendingTransactions.slice(0, itemsPerPage)} 
+                    formatAmount={formatAmount} 
+                    formatDate={formatDate} 
+                    handleAttendanceChange={handleAttendanceChange}
+                    markAsAttended={markAsAttended}
+                    updateTransactionStatus={updateTransactionStatus}
+                  />
+                  {pendingTransactions.length > itemsPerPage && (
+                    <PaginationControls 
+                      currentPage={currentPage} 
+                      totalPages={Math.ceil(pendingTransactions.length / itemsPerPage)} 
+                      setCurrentPage={setCurrentPage}
+                      itemsPerPage={itemsPerPage}
+                      setItemsPerPage={setItemsPerPage}
+                      totalItems={pendingTransactions.length}
+                    />
+                  )}
+                </>
               )}
             </TabsContent>
             
@@ -235,21 +350,171 @@ const TransactionManagement = () => {
               {approvedTransactions.length === 0 ? (
                 <div className="text-center py-8">No approved transactions</div>
               ) : (
-                <TransactionTable 
-                  transactions={approvedTransactions} 
-                  formatAmount={formatAmount} 
-                  formatDate={formatDate} 
-                  handleAttendanceChange={handleAttendanceChange}
-                  markAsAttended={markAsAttended}
-                  updateTransactionStatus={updateTransactionStatus}
-                  isApprovedTab={true}
-                />
+                <>
+                  <TransactionTable 
+                    transactions={approvedTransactions.slice(0, itemsPerPage)} 
+                    formatAmount={formatAmount} 
+                    formatDate={formatDate} 
+                    handleAttendanceChange={handleAttendanceChange}
+                    markAsAttended={markAsAttended}
+                    updateTransactionStatus={updateTransactionStatus}
+                    isApprovedTab={true}
+                  />
+                  {approvedTransactions.length > itemsPerPage && (
+                    <PaginationControls 
+                      currentPage={currentPage} 
+                      totalPages={Math.ceil(approvedTransactions.length / itemsPerPage)} 
+                      setCurrentPage={setCurrentPage}
+                      itemsPerPage={itemsPerPage}
+                      setItemsPerPage={setItemsPerPage}
+                      totalItems={approvedTransactions.length}
+                    />
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>
         )}
       </CardContent>
     </Card>
+  );
+};
+
+// Pagination Controls Component
+const PaginationControls = ({ 
+  currentPage, 
+  totalPages, 
+  setCurrentPage,
+  itemsPerPage,
+  setItemsPerPage,
+  totalItems 
+}) => {
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    
+    // Always show first page
+    pages.push(
+      <PaginationItem key={1}>
+        <PaginationLink 
+          onClick={() => goToPage(1)} 
+          isActive={currentPage === 1}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+    
+    // If there are many pages, show ellipsis
+    if (totalPages > 7) {
+      if (currentPage > 3) {
+        pages.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      // Show pages around current page
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              onClick={() => goToPage(i)} 
+              isActive={currentPage === i}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      if (currentPage < totalPages - 2) {
+        pages.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Show all pages if there aren't many
+      for (let i = 2; i < totalPages; i++) {
+        pages.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              onClick={() => goToPage(i)} 
+              isActive={currentPage === i}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    }
+    
+    // Always show last page if there is more than 1 page
+    if (totalPages > 1) {
+      pages.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink 
+            onClick={() => goToPage(totalPages)} 
+            isActive={currentPage === totalPages}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return pages;
+  };
+
+  return (
+    <div className="mt-4 flex flex-col sm:flex-row items-center justify-between">
+      <div className="text-sm text-muted-foreground mb-2 sm:mb-0">
+        Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+      </div>
+      
+      <div className="flex items-center space-x-2 text-sm">
+        <div className="flex items-center space-x-1">
+          <span>Show</span>
+          <select 
+            className="border border-input rounded px-2 py-1"
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+          >
+            {[10, 25, 50, 100].map(size => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <span>entries</span>
+        </div>
+      </div>
+      
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
+          </PaginationItem>
+          
+          {renderPageNumbers()}
+          
+          <PaginationItem>
+            <PaginationNext onClick={() => goToPage(currentPage + 1)} />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    </div>
   );
 };
 
@@ -263,6 +528,10 @@ const TransactionTable = ({
   updateTransactionStatus,
   isApprovedTab = false
 }) => {
+  if (!transactions || transactions.length === 0) {
+    return <div className="text-center py-4">No matching transactions found</div>;
+  }
+  
   return (
     <div className="overflow-x-auto">
       <Table>
