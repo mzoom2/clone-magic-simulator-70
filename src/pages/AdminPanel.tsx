@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -157,11 +156,13 @@ const TransactionManagement = () => {
         
         toast.success('Transaction status updated and marked as attended');
       } else {
-        toast.error('Failed to update transaction status');
+        const errorData = await statusResponse.json();
+        toast.error(`Failed to update transaction status: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to update transaction:', error);
-      toast.error('Could not connect to the server');
+      // Modified to show more informative error message
+      toast.error(`Server connection issue. Please check if the backend server is running at http://localhost:5000`);
     }
   };
 
