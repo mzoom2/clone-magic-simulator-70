@@ -131,37 +131,40 @@ const TransactionManagement = () => {
     }
   };
 
+  // Updated function to directly mark as attended when a transaction is pending
   const updateTransactionStatus = async (transactionId) => {
     if (!token) return;
     
     try {
-      // First, mark as completed
-      const statusResponse = await fetch(`http://localhost:5000/transactions/${transactionId}/status`, {
+      // Directly use the attended endpoint since that's what we want to do
+      const response = await fetch(`http://localhost:5000/transactions/${transactionId}/attended`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: 'completed' })
+        body: JSON.stringify({ 
+          attended: true 
+        })
       });
       
-      if (statusResponse.ok) {
-        // If status update is successful, mark as attended
-        await markAsAttended(transactionId);
-        
-        // Update local state immediately for better UX
+      if (response.ok) {
+        // Update local state to reflect both status and attendance changes
         setTransactions(transactions.map(t => 
           t.id === transactionId ? { ...t, status: 'completed', attended: true } : t
         ));
         
-        toast.success('Transaction status updated and marked as attended');
+        toast.success('Transaction marked as completed and attended');
       } else {
-        const errorData = await statusResponse.json();
-        toast.error(`Failed to update transaction status: ${errorData.error || 'Unknown error'}`);
+        try {
+          const errorData = await response.json();
+          toast.error(`Failed to update transaction: ${errorData.error || 'Unknown error'}`);
+        } catch (parseError) {
+          toast.error('Failed to process server response');
+        }
       }
     } catch (error) {
       console.error('Failed to update transaction:', error);
-      // Modified to show more informative error message
       toast.error(`Server connection issue. Please check if the backend server is running at http://localhost:5000`);
     }
   };
