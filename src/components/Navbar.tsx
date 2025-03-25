@@ -110,6 +110,10 @@ const Navbar = () => {
     logout();
     navigate('/');
     setIsMenuOpen(false);
+    
+    // Remove any "dialog closed" flags from session storage when logging out
+    sessionStorage.removeItem('auth_dialog_closed');
+    
     toast({
       title: "Logged out",
       description: "You have been logged out successfully",
