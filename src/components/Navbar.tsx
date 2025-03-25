@@ -249,15 +249,17 @@ const Navbar = () => {
                       </Link>
                     )}
                     
-                    {/* Explore link for all users - Updated to point to /enroll */}
-                    <Link 
-                      to="/enroll"
-                      className="flex items-center gap-2 px-4 py-3 text-forest hover:bg-forest/5"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Compass size={18} />
-                      <span>Explore</span>
-                    </Link>
+                    {/* Explore link only for authenticated users */}
+                    {isAuthenticated && (
+                      <Link 
+                        to="/enroll"
+                        className="flex items-center gap-2 px-4 py-3 text-forest hover:bg-forest/5"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Compass size={18} />
+                        <span>Explore</span>
+                      </Link>
+                    )}
                     
                     {/* Main navigation items */}
                     {navItems.map((item) => (
@@ -331,20 +333,22 @@ const Navbar = () => {
         
         {/* Desktop action buttons */}
         <div className={cn("flex items-center gap-4", isMobile ? "hidden" : "flex")}>
-          {/* Explore button for all users - Updated to point to /enroll */}
-          <Button
-            variant="ghost"
-            className={cn(
-              "flex items-center gap-2",
-              scrolled || !hasHeroSection ? "text-forest hover:bg-forest/10" : "text-white hover:bg-white/10"
-            )}
-            asChild
-          >
-            <Link to="/enroll">
-              <Compass size={18} />
-              <span>Explore</span>
-            </Link>
-          </Button>
+          {/* Explore button only for authenticated users */}
+          {isAuthenticated && (
+            <Button
+              variant="ghost"
+              className={cn(
+                "flex items-center gap-2",
+                scrolled || !hasHeroSection ? "text-forest hover:bg-forest/10" : "text-white hover:bg-white/10"
+              )}
+              asChild
+            >
+              <Link to="/enroll">
+                <Compass size={18} />
+                <span>Explore</span>
+              </Link>
+            </Button>
+          )}
           
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
