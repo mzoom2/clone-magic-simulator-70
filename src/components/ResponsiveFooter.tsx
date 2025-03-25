@@ -68,7 +68,7 @@ const ResponsiveFooter = () => {
               </a>
             </div>
             
-            <Link to="/cookie-policy" className="text-white hover:underline">
+            <Link to="/cookie-policy" className="text-white hover:text-white/80">
               Cookie Policy (EU)
             </Link>
           </div>
