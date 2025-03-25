@@ -247,9 +247,7 @@ const TransactionManagement = () => {
   const approvedCount = approvedTransactions.length;
   const totalCount = transactions.length;
 
-  const handleRefresh = () => {
-    setRefreshTimestamp(new Date());
-  };
+  
 
   return (
     <Card>
