@@ -1,5 +1,5 @@
 
-import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import AuthDialog from '@/components/AuthDialog';
 import { useAuth } from './AuthContext';
 
@@ -24,14 +24,6 @@ export const AuthDialogProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
   const { isAuthenticated } = useAuth();
-
-  // Effect to listen for auth state changes
-  useEffect(() => {
-    // If user just logged out, clear any session storage flags
-    if (!isAuthenticated) {
-      sessionStorage.removeItem('auth_dialog_closed');
-    }
-  }, [isAuthenticated]);
 
   const showAuthDialog = useCallback((path?: string) => {
     // Only show the dialog if the user is not already authenticated
