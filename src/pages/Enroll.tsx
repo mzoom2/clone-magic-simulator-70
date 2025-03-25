@@ -95,9 +95,13 @@ const EnrollmentManager = () => {
   const navigate = useNavigate();
   const { setSelectedPackage, setOccupancyType } = useEnrollment();
   const { isAuthenticated } = useAuth();
-  const { checkAuthAndProceed } = useAuthDialogContext();
+  const { checkAuthAndProceed, resetAuthDialogState } = useAuthDialogContext();
   
   useEffect(() => {
+    // Reset auth dialog state when landing on the enroll page
+    // This ensures that if a user cancels auth and tries again, it will work
+    resetAuthDialogState();
+    
     // Show auth dialog only if user is not authenticated
     if (!isAuthenticated) {
       checkAuthAndProceed('/enroll', () => {
@@ -119,7 +123,7 @@ const EnrollmentManager = () => {
         navigate('/enroll/visitors');
       }
     }
-  }, [location.search, setSelectedPackage, setOccupancyType, navigate, isAuthenticated, checkAuthAndProceed]);
+  }, [location.search, setSelectedPackage, setOccupancyType, navigate, isAuthenticated, checkAuthAndProceed, resetAuthDialogState]);
   
   const renderStep = () => {
     switch (step) {

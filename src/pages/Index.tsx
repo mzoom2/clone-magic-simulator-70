@@ -7,8 +7,11 @@ import Experience from '@/components/Experience';
 import Testimonial from '@/components/Testimonial';
 import Contact from '@/components/Contact';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
+import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
 
 const Index = () => {
+  const { resetAuthDialogState } = useAuthDialogContext();
+
   // Add smooth scroll behavior for anchor links
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
@@ -33,6 +36,12 @@ const Index = () => {
     document.addEventListener('click', handleAnchorClick);
     return () => document.removeEventListener('click', handleAnchorClick);
   }, []);
+
+  // Reset auth dialog state when landing on home page
+  useEffect(() => {
+    // This will ensure that the auth dialog can be triggered again after navigation
+    resetAuthDialogState();
+  }, [resetAuthDialogState]);
 
   return (
     <div className="min-h-screen bg-white">
