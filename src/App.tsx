@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,7 +26,7 @@ import { useEffect, useState } from "react";
 
 const queryClient = new QueryClient();
 
-// Check for auth token in URL and save it to localStorage
+// Check for auth token and payment status in URL
 const CheckAuthToken = () => {
   const location = useLocation();
   const { token, refreshUserData } = useAuth();
@@ -36,6 +35,7 @@ const CheckAuthToken = () => {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const authToken = query.get('auth_token');
+    const paymentStatus = query.get('payment_status');
     
     if (authToken && !token && !tokenProcessed) {
       console.log('Found auth token in URL, restoring session');
@@ -47,10 +47,19 @@ const CheckAuthToken = () => {
       refreshUserData();
       setTokenProcessed(true);
       
-      // Remove the token from the URL to avoid exposing it
-      const newUrl = window.location.pathname + 
-        (location.search ? location.search.replace(/(&|\?)auth_token=[^&]+/, '') : '');
+      // Remove the token from the URL to avoid exposing it, but keep payment_status if present
+      let newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete('auth_token');
+      const newSearch = newSearchParams.toString();
+      const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
+      
       window.history.replaceState({}, '', newUrl);
+    }
+    
+    // If there's a payment_status of 'success', notify the user (it will handle in dashboard page)
+    if (paymentStatus === 'success' && location.pathname === '/dashboard') {
+      // Don't need additional code here as DashboardPage will handle the payment_status
+      console.log('Payment success detected in URL');
     }
   }, [location, token, refreshUserData, tokenProcessed]);
   

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
@@ -63,7 +64,7 @@ const Payment = () => {
         description: "Your booking has been confirmed. Thank you for choosing us!",
       });
       
-      // Reset enrollment and redirect to dashboard immediately
+      // Reset enrollment and redirect to dashboard instead of enrollment page
       resetEnrollment();
       navigate('/dashboard');
     } else if (status === 'canceled') {

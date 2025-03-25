@@ -78,7 +78,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ amount, packageTitle, onSuc
       
       // Include auth token in the URL to preserve authentication state
       const authToken = localStorage.getItem('auth_token');
-      const successUrl = `${origin}/enroll/payment?payment_status=success&session_id={CHECKOUT_SESSION_ID}&auth_token=${authToken || ''}`;
+      // Change success URL to redirect to dashboard instead of enrollment
+      const successUrl = `${origin}/dashboard?payment_status=success&session_id={CHECKOUT_SESSION_ID}&auth_token=${authToken || ''}`;
       const cancelUrl = `${origin}/enroll/payment?payment_status=canceled&auth_token=${authToken || ''}`;
       
       // Make request to Python backend to create checkout session
