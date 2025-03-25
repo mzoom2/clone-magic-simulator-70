@@ -7,6 +7,7 @@ type AuthDialogContextType = {
   showAuthDialog: (redirectPath?: string) => void;
   checkAuthAndProceed: (redirectPath: string, onAuthenticated: () => void) => void;
   resetAuthDialogState: () => void;
+  dismissAuthDialog: () => void;
 };
 
 const AuthDialogContext = createContext<AuthDialogContextType | undefined>(undefined);
@@ -32,6 +33,13 @@ export const AuthDialogProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   }, [isAuthenticated]);
 
+  const dismissAuthDialog = useCallback(() => {
+    // This function just closes the dialog without setting the session storage flag
+    // so it can be opened again
+    setIsDialogOpen(false);
+    setRedirectPath(undefined);
+  }, []);
+
   const resetAuthDialogState = useCallback(() => {
     // Remove any stored state in sessionStorage that might prevent the dialog from showing again
     sessionStorage.removeItem('auth_dialog_closed');
@@ -49,11 +57,16 @@ export const AuthDialogProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [isAuthenticated, showAuthDialog]);
 
   return (
-    <AuthDialogContext.Provider value={{ showAuthDialog, checkAuthAndProceed, resetAuthDialogState }}>
+    <AuthDialogContext.Provider value={{ 
+      showAuthDialog, 
+      checkAuthAndProceed, 
+      resetAuthDialogState,
+      dismissAuthDialog 
+    }}>
       {children}
       <AuthDialog
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={() => dismissAuthDialog()}
         redirectPath={redirectPath}
       />
     </AuthDialogContext.Provider>

@@ -154,6 +154,13 @@ const EnrollmentManager = () => {
 };
 
 const Enroll = () => {
+  const { resetAuthDialogState } = useAuthDialogContext();
+  
+  // Always reset auth dialog state when component mounts
+  useEffect(() => {
+    resetAuthDialogState();
+  }, [resetAuthDialogState]);
+
   return (
     <EnrollmentProvider>
       <div className="flex flex-col min-h-screen">
