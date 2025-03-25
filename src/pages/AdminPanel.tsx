@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -102,7 +101,11 @@ const TransactionManagement = () => {
       
       if (response.ok) {
         const data = await response.json();
-        setTransactions(data.transactions || []);
+        // Sort transactions with newest at the top
+        const sortedTransactions = (data.transactions || []).sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setTransactions(sortedTransactions);
       } else {
         toast.error('Failed to fetch transactions');
       }
@@ -243,6 +246,10 @@ const TransactionManagement = () => {
   const pendingCount = pendingTransactions.length;
   const approvedCount = approvedTransactions.length;
   const totalCount = transactions.length;
+
+  const handleRefresh = () => {
+    setRefreshTimestamp(new Date());
+  };
 
   return (
     <Card>

@@ -74,7 +74,11 @@ const DashboardPage = () => {
       
       if (response.ok) {
         const data = await response.json();
-        setTransactions(data.transactions || []);
+        // Sort transactions by created_at date, newest first
+        const sortedTransactions = (data.transactions || []).sort((a: Transaction, b: Transaction) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setTransactions(sortedTransactions);
         
         // Show toast only when manually refreshing
         if (silent && isRefreshing) {

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
@@ -64,11 +63,9 @@ const Payment = () => {
         description: "Your booking has been confirmed. Thank you for choosing us!",
       });
       
-      // Reset enrollment and redirect to dashboard after short delay
-      setTimeout(() => {
-        resetEnrollment();
-        navigate('/dashboard');
-      }, 1500);
+      // Reset enrollment and redirect to dashboard immediately
+      resetEnrollment();
+      navigate('/dashboard');
     } else if (status === 'canceled') {
       setPaymentStatus('canceled');
       toast({
