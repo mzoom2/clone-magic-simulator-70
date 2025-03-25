@@ -496,7 +496,16 @@ def mark_transaction_attended(current_user, transaction_id):
             return jsonify({'error': 'Transaction not found'}), 404
         
         data = request.json
-        transaction.attended = data.get('attended', True)
+        attended_value = data.get('attended', True)
+        
+        # Update both status and attended fields to ensure consistency
+        transaction.attended = attended_value
+        
+        # If marking as attended, also ensure status is 'completed'
+        if attended_value:
+            transaction.status = 'completed'
+            logger.info(f"Transaction {transaction_id} marked as attended and completed by admin {current_user.email}")
+        
         db.session.commit()
         
         return jsonify({
