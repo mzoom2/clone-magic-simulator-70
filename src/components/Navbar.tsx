@@ -251,7 +251,7 @@ const Navbar = () => {
                     
                     {/* Explore link for all users */}
                     <Link 
-                      to="/catalogue"
+                      to="/enroll"
                       className="flex items-center gap-2 px-4 py-3 text-forest hover:bg-forest/5"
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -340,7 +340,7 @@ const Navbar = () => {
             )}
             asChild
           >
-            <Link to="/catalogue">
+            <Link to="/enroll">
               <Compass size={18} />
               <span>Explore</span>
             </Link>
