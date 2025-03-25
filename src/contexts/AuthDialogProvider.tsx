@@ -28,6 +28,8 @@ export const AuthDialogProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const showAuthDialog = useCallback((path?: string) => {
     // Only show the dialog if the user is not already authenticated
     if (!isAuthenticated) {
+      // Clear any previous "closed" state in session storage before showing the dialog
+      sessionStorage.removeItem('auth_dialog_closed');
       setRedirectPath(path);
       setIsDialogOpen(true);
     }

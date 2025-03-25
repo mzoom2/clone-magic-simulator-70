@@ -14,7 +14,12 @@ const SummerTech = () => {
   const pricingRef = useRef<HTMLDivElement>(null);
   const paymentRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { checkAuthAndProceed } = useAuthDialogContext();
+  const { checkAuthAndProceed, resetAuthDialogState } = useAuthDialogContext();
+  
+  // Reset auth dialog state when the component mounts
+  useEffect(() => {
+    resetAuthDialogState();
+  }, [resetAuthDialogState]);
   
   useEffect(() => {
     const observerOptions = {

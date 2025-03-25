@@ -1,12 +1,19 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PricingCard from '@/components/PricingCard';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
+import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
 
 const FashionWeek = () => {
+  const { resetAuthDialogState } = useAuthDialogContext();
+  
+  // Reset auth dialog state when the component mounts
+  useEffect(() => {
+    resetAuthDialogState();
+  }, [resetAuthDialogState]);
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />

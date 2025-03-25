@@ -22,9 +22,12 @@ const PricingCard = ({
   features,
   onBookNow 
 }: PricingCardProps) => {
-  const { checkAuthAndProceed } = useAuthDialogContext();
+  const { checkAuthAndProceed, resetAuthDialogState } = useAuthDialogContext();
   
   const handleBookNow = () => {
+    // Always reset dialog state before checking auth
+    resetAuthDialogState();
+    
     if (onBookNow) {
       onBookNow();
     } else {
