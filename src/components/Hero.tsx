@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { cn } from "@/lib/utils";
+import { assetPaths } from "@/utils/assetPaths";
 
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -25,7 +26,7 @@ const Hero = () => {
           }}
           onLoadedData={() => setIsLoaded(true)}
         >
-          <source src="/assets/videos/hero-video.mp4" type="video/mp4" />
+          <source src={assetPaths.videos.heroVideo} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 hero-overlay"></div>

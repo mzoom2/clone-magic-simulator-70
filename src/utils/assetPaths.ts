@@ -1,61 +1,76 @@
 
-// This file maps the original file paths to the new organized assets
+// This file centralizes all asset paths for easy management
 export const assetPaths = {
   // Videos
-  heroVideo: {
-    original: '/lovable-uploads/1bfbcad9-04e3-445e-8d19-840a15a1642a.mp4',
-    new: '/assets/videos/hero-video.mp4'
+  videos: {
+    heroVideo: "/assets/media/hero-video.mp4",
   },
   
   // Images
-  founderImage: {
-    original: '/lovable-uploads/5105021d-b044-4cfc-8833-37ce9098c033.png',
-    new: '/assets/images/founder.png'
-  },
-  founderBackground: {
-    original: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    new: '/assets/images/founder-background.png'
-  },
-  packageBackground: {
-    original: '/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png',
-    new: '/assets/images/package-background.png'
+  images: {
+    // Experience photos
+    experiencePhotos: {
+      artExhibition: "/assets/media/art-exhibition.png",
+      olumoRock: "/assets/media/olumo-rock.png",
+      abeokuta: "/assets/media/abeokuta.png",
+      nationalTheatre: "/assets/media/national-theatre.png",
+    },
+    
+    // People photos
+    people: {
+      founder: "/assets/media/founder.png",
+    },
+    
+    // Background images
+    backgrounds: {
+      founder: "/assets/media/founder-background.png",
+      package: "/assets/media/package-background.png",
+    }
   },
   
-  // Experience Photos
-  artExhibition: {
-    original: '/lovable-uploads/96279a5f-6291-4c07-9ed1-946fbc4ae3dc.png',
-    new: '/assets/images/art-exhibition.png'
-  },
-  olumoRock: {
-    original: '/lovable-uploads/99d1a1e9-33f0-48d1-884c-3aa027ee3443.png',
-    new: '/assets/images/olumo-rock.png'
-  },
-  abeokuta: {
-    original: '/lovable-uploads/98c065bb-d219-401e-90c2-6c8db78dbb40.png',
-    new: '/assets/images/abeokuta.png'
-  },
-  nationalTheatre: {
-    original: '/lovable-uploads/5617c3ad-1f1f-4878-ae9a-40862d14df7b.png',
-    new: '/assets/images/national-theatre.png'
+  // Legacy path mapping (for backward compatibility)
+  // Maps the original file paths to the new organized assets
+  legacy: {
+    // Videos
+    "/assets/videos/hero-video.mp4": "/assets/media/hero-video.mp4",
+    
+    // Images
+    "/assets/images/founder.png": "/assets/media/founder.png",
+    "/assets/images/founder-background.png": "/assets/media/founder-background.png",
+    "/assets/images/package-background.png": "/assets/media/package-background.png",
+    "/assets/images/art-exhibition.png": "/assets/media/art-exhibition.png",
+    "/assets/images/olumo-rock.png": "/assets/media/olumo-rock.png",
+    "/assets/images/abeokuta.png": "/assets/media/abeokuta.png",
+    "/assets/images/national-theatre.png": "/assets/media/national-theatre.png",
   },
   
   // Helper function to convert old paths to new paths
   convertPath: (oldPath: string): string => {
+    // First check if we have a direct mapping in legacy
+    if (assetPaths.legacy[oldPath as keyof typeof assetPaths.legacy]) {
+      return assetPaths.legacy[oldPath as keyof typeof assetPaths.legacy];
+    }
+    
     // If the path is already using the new format, return it
-    if (oldPath.startsWith('/assets/')) {
+    if (oldPath.startsWith('/assets/media/')) {
       return oldPath;
     }
     
-    // Handle simple replacements for lovable-uploads
+    // Handle simple replacements for older formats
+    if (oldPath.startsWith('/assets/videos/')) {
+      const filename = oldPath.split('/').pop();
+      return `/assets/media/${filename}`;
+    } 
+    
+    if (oldPath.startsWith('/assets/images/')) {
+      const filename = oldPath.split('/').pop();
+      return `/assets/media/${filename}`;
+    }
+    
+    // Handle lovable-uploads paths
     if (oldPath.startsWith('/lovable-uploads/')) {
       const filename = oldPath.split('/').pop();
-      
-      // Determine if it's a video or image based on extension
-      if (filename?.endsWith('.mp4')) {
-        return `/assets/videos/${filename}`;
-      } else {
-        return `/assets/images/${filename}`;
-      }
+      return `/assets/media/${filename}`;
     }
     
     // Return original if no match
