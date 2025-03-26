@@ -28,23 +28,20 @@ export const AuthDialogProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const showAuthDialog = useCallback((path?: string) => {
     // Only show the dialog if the user is not already authenticated
     if (!isAuthenticated) {
-      // Clear any previous "closed" state in session storage before showing the dialog
-      sessionStorage.removeItem('auth_dialog_closed');
       setRedirectPath(path);
       setIsDialogOpen(true);
     }
   }, [isAuthenticated]);
 
   const dismissAuthDialog = useCallback(() => {
-    // This function just closes the dialog without setting the session storage flag
-    // so it can be opened again
+    // This function just closes the dialog without setting any session storage flags
+    // so it can be opened again later
     setIsDialogOpen(false);
     setRedirectPath(undefined);
   }, []);
 
   const resetAuthDialogState = useCallback(() => {
-    // Remove any stored state in sessionStorage that might prevent the dialog from showing again
-    sessionStorage.removeItem('auth_dialog_closed');
+    // Remove any stored state that might prevent the dialog from showing again
     setIsDialogOpen(false);
     setRedirectPath(undefined);
   }, []);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown, LogOut, User, Home, Compass } from "lucide-react";
@@ -14,12 +13,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthDialogContext } from "@/contexts/AuthDialogProvider";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -29,10 +28,12 @@ const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { checkAuthAndProceed, resetAuthDialogState } = useAuthDialogContext();
   
   // Determine active page based on route
   const [activePage, setActivePage] = useState('Home');
   
+  // Modified to use the resetAuthDialogState before showing the dialog
   useEffect(() => {
     // Set the active page based on the current route
     if (location.pathname === '/') {
@@ -113,6 +114,14 @@ const Navbar = () => {
     toast({
       title: "Logged out",
       description: "You have been logged out successfully",
+    });
+  };
+
+  // Add a proper handler for the ENROLL NOW button
+  const handleEnrollClick = () => {
+    resetAuthDialogState(); // Reset dialog state before checking auth
+    checkAuthAndProceed('/enroll', () => {
+      navigate('/enroll');
     });
   };
 
@@ -378,8 +387,8 @@ const Navbar = () => {
               </DropdownMenu>
             </div>
           ) : (
-            <Link 
-              to="/enroll"
+            <button 
+              onClick={handleEnrollClick}
               className={cn(
                 "px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 text-center",
                 scrolled || !hasHeroSection 
@@ -388,7 +397,7 @@ const Navbar = () => {
               )}
             >
               ENROLL NOW
-            </Link>
+            </button>
           )}
         </div>
       </div>
