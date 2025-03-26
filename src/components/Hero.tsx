@@ -25,7 +25,7 @@ const Hero = () => {
           }}
           onLoadedData={() => setIsLoaded(true)}
         >
-          <source src="/lovable-uploads/1bfbcad9-04e3-445e-8d19-840a15a1642a.mp4" type="video/mp4" />
+          <source src="/assets/videos/hero-video.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 hero-overlay"></div>

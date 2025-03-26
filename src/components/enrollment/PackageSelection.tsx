@@ -54,7 +54,7 @@ const PackageSelection = () => {
           >
             <div className="relative h-48 overflow-hidden">
               <img 
-                src={pkg.image} 
+                src={pkg.image.replace('/lovable-uploads/', '/assets/images/')} 
                 alt={pkg.title} 
                 className="w-full h-full object-cover"
               />

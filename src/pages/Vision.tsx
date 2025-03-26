@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
@@ -50,7 +51,7 @@ const Vision = () => {
             loop
             playsInline
           >
-            <source src="/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png" type="video/mp4" />
+            <source src="/assets/images/founder-background.png" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           <div className="absolute inset-0 hero-overlay"></div>
@@ -67,7 +68,7 @@ const Vision = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-forest/10 rounded-lg transform rotate-3"></div>
                 <img 
-                  src="/lovable-uploads/5105021d-b044-4cfc-8833-37ce9098c033.png"
+                  src="/assets/images/founder.png"
                   alt="Motyat Olatunmbi" 
                   className="relative rounded-lg shadow-lg w-full h-auto z-10"
                 />

@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { PlayCircle, Volume2, ArrowRight } from "lucide-react";
@@ -33,22 +32,22 @@ const experiencePhotos = [
   {
     id: 1,
     title: "Nigerian Art Exhibition",
-    image: "/lovable-uploads/96279a5f-6291-4c07-9ed1-946fbc4ae3dc.png",
+    image: "/assets/images/art-exhibition.png",
   },
   {
     id: 2,
     title: "Olumo Rock Experience",
-    image: "/lovable-uploads/99d1a1e9-33f0-48d1-884c-3aa027ee3443.png",
+    image: "/assets/images/olumo-rock.png",
   },
   {
     id: 3,
     title: "Scenic View of Abeokuta",
-    image: "/lovable-uploads/98c065bb-d219-401e-90c2-6c8db78dbb40.png",
+    image: "/assets/images/abeokuta.png",
   },
   {
     id: 4,
     title: "National Theatre Lagos",
-    image: "/lovable-uploads/5617c3ad-1f1f-4878-ae9a-40862d14df7b.png",
+    image: "/assets/images/national-theatre.png",
   }
 ];
 

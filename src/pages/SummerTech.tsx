@@ -61,7 +61,7 @@ const SummerTech = () => {
       <section className="relative h-[60vh] bg-forest">
         <div className="absolute inset-0">
           <img 
-            src="/lovable-uploads/97c40b5f-db2d-4367-a2ae-4a67d17b3bb2.png" 
+            src="/assets/images/package-background.png" 
             alt="Summer Tech Background" 
             className="w-full h-full object-cover"
           />
