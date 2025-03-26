@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PricingCard from '@/components/PricingCard';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
+import { assetPaths } from '@/utils/assetPaths';
 
 const OctoberTech = () => {
   return (
@@ -15,7 +16,7 @@ const OctoberTech = () => {
       <section className="relative h-[60vh] bg-forest">
         <div className="absolute inset-0">
           <img 
-            src="/assets/images/package-background.png" 
+            src={assetPaths.images.backgrounds.package} 
             alt="October Tech Background" 
             className="w-full h-full object-cover"
           />

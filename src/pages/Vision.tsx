@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import BackToTop from '@/components/BackToTop';
+import { assetPaths } from '@/utils/assetPaths';
 
 const Vision = () => {
   const founderRef = useRef<HTMLDivElement>(null);
@@ -51,7 +52,7 @@ const Vision = () => {
             loop
             playsInline
           >
-            <source src="/assets/images/founder-background.png" type="video/mp4" />
+            <source src={assetPaths.images.backgrounds.founder} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           <div className="absolute inset-0 hero-overlay"></div>
@@ -68,7 +69,7 @@ const Vision = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-forest/10 rounded-lg transform rotate-3"></div>
                 <img 
-                  src="/assets/images/founder.png"
+                  src={assetPaths.images.people.founder}
                   alt="Motyat Olatunmbi" 
                   className="relative rounded-lg shadow-lg w-full h-auto z-10"
                 />

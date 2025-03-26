@@ -6,6 +6,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import BackToTop from './BackToTop';
+import { assetPaths } from "@/utils/assetPaths";
 
 const experiences = [
   {
@@ -32,22 +33,22 @@ const experiencePhotos = [
   {
     id: 1,
     title: "Nigerian Art Exhibition",
-    image: "/assets/images/art-exhibition.png",
+    image: assetPaths.images.experiencePhotos.artExhibition,
   },
   {
     id: 2,
     title: "Olumo Rock Experience",
-    image: "/assets/images/olumo-rock.png",
+    image: assetPaths.images.experiencePhotos.olumoRock,
   },
   {
     id: 3,
     title: "Scenic View of Abeokuta",
-    image: "/assets/images/abeokuta.png",
+    image: assetPaths.images.experiencePhotos.abeokuta,
   },
   {
     id: 4,
     title: "National Theatre Lagos",
-    image: "/assets/images/national-theatre.png",
+    image: assetPaths.images.experiencePhotos.nationalTheatre,
   }
 ];
 

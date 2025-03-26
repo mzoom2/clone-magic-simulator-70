@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { assetPaths } from '@/utils/assetPaths';
 
 const PackageSelection = () => {
   const { packages, setSelectedPackage, setOccupancyType } = useEnrollment();
@@ -54,7 +55,7 @@ const PackageSelection = () => {
           >
             <div className="relative h-48 overflow-hidden">
               <img 
-                src={pkg.image.replace('/lovable-uploads/', '/assets/images/')} 
+                src={assetPaths.convertPath(pkg.image)} 
                 alt={pkg.title} 
                 className="w-full h-full object-cover"
               />

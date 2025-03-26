@@ -8,6 +8,7 @@ import PricingCard from '@/components/PricingCard';
 import ResponsiveFooter from '@/components/ResponsiveFooter';
 import BackToTop from '@/components/BackToTop';
 import { useAuthDialogContext } from '@/contexts/AuthDialogProvider';
+import { assetPaths } from '@/utils/assetPaths';
 
 const SummerTech = () => {
   const descriptionRef = useRef<HTMLDivElement>(null);
@@ -61,7 +62,7 @@ const SummerTech = () => {
       <section className="relative h-[60vh] bg-forest">
         <div className="absolute inset-0">
           <img 
-            src="/assets/images/package-background.png" 
+            src={assetPaths.images.backgrounds.package} 
             alt="Summer Tech Background" 
             className="w-full h-full object-cover"
           />
